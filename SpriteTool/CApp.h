@@ -6,6 +6,9 @@
 #define SCREEN_WIDTH	800
 #define SCREEN_HEIGHT	600
 
+class CSpriteWnd;
+class CAnimWnd;
+
 class CApp
 {
 private:
@@ -17,9 +20,11 @@ private:
 	HINSTANCE m_hInst = nullptr;
 	HWND m_hWnd = nullptr;
 
-
 	int m_mouseX, m_mouseY;
 	int m_mag = 100; // 확대, 축소 배율
+
+	CAnimWnd* m_animWnd;
+	CSpriteWnd* m_spriteWnd;
 
 private:
 	CApp() { }

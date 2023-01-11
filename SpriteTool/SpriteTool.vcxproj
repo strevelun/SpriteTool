@@ -127,15 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CAnimWnd.cpp" />
     <ClCompile Include="CApp.cpp" />
     <ClCompile Include="CBWnd.cpp" />
     <ClCompile Include="CCore.cpp" />
+    <ClCompile Include="CSpriteWnd.cpp" />
     <ClCompile Include="SpriteTool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CAnimWnd.h" />
     <ClInclude Include="CApp.h" />
     <ClInclude Include="CBWnd.h" />
     <ClInclude Include="CCore.h" />
+    <ClInclude Include="CSpriteWnd.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
