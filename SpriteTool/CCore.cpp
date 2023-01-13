@@ -15,27 +15,16 @@ CCore::~CCore()
 
 }
 
-HRESULT CCore::InitDevice(HWND hWnd)
+HRESULT CCore::InitDevice()
 {
 	HRESULT hr = S_OK;
-
-	RECT	rc;
-	GetClientRect(hWnd, &rc);
-
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
 	if (FAILED(hr)) return hr;
 
-	hr = m_pD2DFactory->CreateHwndRenderTarget(
-		D2D1::RenderTargetProperties(),
-		D2D1::HwndRenderTargetProperties(hWnd,
-			D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)),
-		&m_pRenderTarget);
-	if (FAILED(hr)) return hr;
-
+	CoInitialize(nullptr);
 	hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pWICFactory));
 	if (FAILED(hr)) return hr;
 
-	hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pBlackBrush);
 
 	return hr;
 }
@@ -79,11 +68,29 @@ void CCore::CleanupDevice()
 	CoUninitialize();
 }
 
-bool CCore::Init(HWND hWnd)
+bool CCore::Init()
 {
-	if (FAILED(InitDevice(hWnd)))
+	if (FAILED(InitDevice()))
 	{
 		CleanupDevice();
 		return false;
 	}
+}
+
+HRESULT CCore::CreateRenderTarget(HWND _hWnd)
+{
+	HRESULT hr = S_OK;
+
+	RECT	rc;
+	GetClientRect(_hWnd, &rc);
+
+	hr = m_pD2DFactory->CreateHwndRenderTarget(
+		D2D1::RenderTargetProperties(),
+		D2D1::HwndRenderTargetProperties(_hWnd,
+			D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)),
+		&m_pRenderTarget);
+	if (FAILED(hr)) return hr;
+
+	hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pBlackBrush);
+
 }

@@ -1,9 +1,7 @@
 #include "CAnimWnd.h"
 
 #include "CApp.h"
-
-
-LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam);
+#include "CCore.h"
 
 CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 {
@@ -17,35 +15,10 @@ CAnimWnd::~CAnimWnd()
 
 bool CAnimWnd::Create(int _width, int _height, int nCmdShow)
 {
-	WNDCLASSEX wcex;
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = sizeof(LONG_PTR);
-	wcex.hInstance = m_hInst;
-	wcex.hIcon = LoadIcon(m_hInst, IDI_APPLICATION);
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = nullptr;
-	wcex.lpszClassName = L"D2DTutWindowClassAnim";
-	wcex.hIconSm = LoadIcon(m_hInst, IDI_APPLICATION);
+	if (CBWnd::Create(L"D2DTutWindowClassAnim", _width, _height, nCmdShow) == false)
+		return false;
 
-	RegisterClassEx(&wcex);
-
-	RECT rc = { 0, 0, _width, _height };
-
-	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-
-	m_hWnd = CreateWindow(L"D2DTutWindowClassAnim", L"Animation",
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, m_hInst,
-		this);
-
-	if (!m_hWnd) return false;
-
-	ShowWindow(m_hWnd, nCmdShow);
-	UpdateWindow(m_hWnd);
+	CCore::GetInst()->CreateRenderTarget(m_hWnd);
 
 	return true;
 }

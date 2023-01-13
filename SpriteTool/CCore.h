@@ -20,7 +20,7 @@ private:
 	IWICImagingFactory* m_pWICFactory = nullptr;
 
 private:
-	HRESULT InitDevice(HWND hWnd);
+	HRESULT InitDevice();
 
 public:
 
@@ -40,7 +40,9 @@ public:
 		}
 	}
 
-	bool Init(HWND hWnd);
+	bool Init();
+
+	HRESULT CreateRenderTarget(HWND _hWnd);
 
 	void CleanupDevice();
 	HRESULT LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1Bitmap** _pBitmap);
