@@ -29,7 +29,7 @@ HRESULT CCore::InitDevice()
 	return hr;
 }
 
-HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1Bitmap** _pBitmap)
+HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap)
 {
 	HRESULT hr = S_OK;
 	IWICBitmapDecoder* pDecoder = nullptr;
@@ -48,7 +48,7 @@ HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1Bitmap** _pBitmap)
 	hr = pConverter->Initialize(pFrame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
 	if (FAILED(hr)) return hr;
 
-	hr = m_pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, _pBitmap);
+	hr = _pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, _pBitmap);
 	if (FAILED(hr)) return hr;
 
 
@@ -63,7 +63,6 @@ HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1Bitmap** _pBitmap)
 void CCore::CleanupDevice()
 {
 	//if (m_pWICFactory) m_pWICFactory->Release();
-	if (m_pRenderTarget) m_pRenderTarget->Release();
 	if (m_pD2DFactory) m_pD2DFactory->Release();
 	CoUninitialize();
 }
@@ -77,20 +76,22 @@ bool CCore::Init()
 	}
 }
 
-HRESULT CCore::CreateRenderTarget(HWND _hWnd)
+ID2D1HwndRenderTarget* CCore::CreateRenderTarget(HWND _hWnd)
 {
 	HRESULT hr = S_OK;
+	ID2D1HwndRenderTarget* renderTarget = nullptr;
 
 	RECT	rc;
 	GetClientRect(_hWnd, &rc);
 
 	hr = m_pD2DFactory->CreateHwndRenderTarget(
-		D2D1::RenderTargetProperties(),
+		D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_HARDWARE),
 		D2D1::HwndRenderTargetProperties(_hWnd,
 			D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)),
-		&m_pRenderTarget);
-	if (FAILED(hr)) return hr;
+		&renderTarget);
+	if (FAILED(hr)) return nullptr;
 
-	hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pBlackBrush);
 
+
+	return renderTarget;
 }

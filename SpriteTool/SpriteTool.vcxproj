@@ -129,17 +129,27 @@
   <ItemGroup>
     <ClCompile Include="CAnimWnd.cpp" />
     <ClCompile Include="CApp.cpp" />
+    <ClCompile Include="CBitmap.cpp" />
     <ClCompile Include="CBWnd.cpp" />
     <ClCompile Include="CCore.cpp" />
+    <ClCompile Include="CMouse.cpp" />
+    <ClCompile Include="CSprite.cpp" />
     <ClCompile Include="CSpriteWnd.cpp" />
     <ClCompile Include="SpriteTool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAnimWnd.h" />
     <ClInclude Include="CApp.h" />
+    <ClInclude Include="CBitmap.h" />
     <ClInclude Include="CBWnd.h" />
     <ClInclude Include="CCore.h" />
+    <ClInclude Include="CMouse.h" />
+    <ClInclude Include="CSprite.h" />
     <ClInclude Include="CSpriteWnd.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SpriteTool.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

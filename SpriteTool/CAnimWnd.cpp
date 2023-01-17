@@ -2,15 +2,17 @@
 
 #include "CApp.h"
 #include "CCore.h"
+#include "CBitmap.h"
 
 CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 {
 	m_hInst = hInstance;
-
 }
 
 CAnimWnd::~CAnimWnd()
 {
+	if (m_pRenderTarget) m_pRenderTarget->Release();
+	delete m_pImage;
 }
 
 bool CAnimWnd::Create(int _width, int _height, int nCmdShow)
@@ -18,7 +20,9 @@ bool CAnimWnd::Create(int _width, int _height, int nCmdShow)
 	if (CBWnd::Create(L"D2DTutWindowClassAnim", _width, _height, nCmdShow) == false)
 		return false;
 
-	CCore::GetInst()->CreateRenderTarget(m_hWnd);
+	m_pImage = new CBitmap();
+
+	InvalidateRgn(m_hWnd, NULL, true);
 
 	return true;
 }
@@ -32,6 +36,9 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
+
+		Render();
+
 		EndPaint(hWnd, &ps);
 		break;
 
@@ -39,7 +46,6 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_LBUTTONDOWN:
-		MessageBox(hWnd, L"Anim", L"Anim", MB_OK);
 		break;
 
 	case WM_RBUTTONDOWN:
@@ -57,4 +63,17 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	return 0;
+}
+
+void CAnimWnd::Render()
+{
+	if (!m_pRenderTarget)	return;
+	if (!m_pImage)			return;
+
+	m_pRenderTarget->BeginDraw();
+	m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+
+	m_pImage->Render(m_pRenderTarget);
+
+	m_pRenderTarget->EndDraw();
 }

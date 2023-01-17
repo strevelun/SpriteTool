@@ -15,8 +15,6 @@ private:
 	~CCore();
 
 	ID2D1Factory* m_pD2DFactory = nullptr;
-	ID2D1SolidColorBrush* m_pBlackBrush = nullptr;
-	ID2D1HwndRenderTarget* m_pRenderTarget = nullptr;
 	IWICImagingFactory* m_pWICFactory = nullptr;
 
 private:
@@ -42,8 +40,8 @@ public:
 
 	bool Init();
 
-	HRESULT CreateRenderTarget(HWND _hWnd);
+	ID2D1HwndRenderTarget* CreateRenderTarget(HWND _hWnd);
 
 	void CleanupDevice();
-	HRESULT LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1Bitmap** _pBitmap);
+	HRESULT LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap);
 };

@@ -1,6 +1,8 @@
 #include "CBWnd.h"
 #include "CApp.h"
+#include "CCore.h"
 #include <d2d1.h>
+#include "resource.h"
 
 LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam);
 
@@ -30,7 +32,7 @@ bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow
 	wcex.hIcon = LoadIcon(m_hInst, IDI_APPLICATION);
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = nullptr;
+	wcex.lpszMenuName = MAKEINTRESOURCE(IDR_MENU1);
 	wcex.lpszClassName = _lpszClassName;
 	wcex.hIconSm = LoadIcon(m_hInst, IDI_APPLICATION);
 
@@ -44,10 +46,19 @@ bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow
 		this);
 	if (!m_hWnd) return false;
 
+	m_pRenderTarget = CCore::GetInst()->CreateRenderTarget(m_hWnd);
+	
+	HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pBlackBrush);
+	if (FAILED(hr)) return false;
+
 	ShowWindow(m_hWnd, nCmdShow);
 	UpdateWindow(m_hWnd);
 
 	return true;
+}
+
+void CBWnd::Render()
+{
 }
 
 

@@ -41,6 +41,8 @@ public:
 	HRESULT Init(HINSTANCE hInstance, int nCmdShow);
 	int Run();
 
+	CAnimWnd* GetAnimWnd() const { return m_animWnd; }
+	CSpriteWnd* GetSpriteWnd() const { return m_spriteWnd; }
 
 	LRESULT CALLBACK Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
