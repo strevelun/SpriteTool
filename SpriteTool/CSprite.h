@@ -5,10 +5,13 @@
 class CSprite
 {
 private:
-	D2D1_RECT_U m_size = {};
+	D2D1_RECT_F m_size = {};
+	ID2D1Bitmap* m_bitmap = nullptr;
 
-	void GetBitmap()                                        
-	{
-	}
+public:
+	CSprite(D2D1_RECT_F _rect);
+	~CSprite();
+
+	D2D1_RECT_F GetSize() const { return m_size; }
 };
 

@@ -25,10 +25,13 @@ HRESULT CCore::InitDevice()
 	hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pWICFactory));
 	if (FAILED(hr)) return hr;
 
+	
 
 	return hr;
 }
 
+
+//https://learn.microsoft.com/ko-kr/windows/win32/wic/-wic-bitmapsources-howto-modifypixels?redirectedfrom=MSDN
 HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap)
 {
 	HRESULT hr = S_OK;
@@ -48,8 +51,38 @@ HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pR
 	hr = pConverter->Initialize(pFrame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
 	if (FAILED(hr)) return hr;
 
-	hr = _pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, _pBitmap);
-	if (FAILED(hr)) return hr;
+	IWICBitmap* pIBitmap = nullptr;
+	IWICBitmapLock* pILock = nullptr;
+
+	hr = m_pWICFactory->CreateBitmapFromSource(pFrame, WICBitmapCacheOnDemand, &pIBitmap);
+	UINT width, height;
+	pIBitmap->GetSize(&width, &height);
+	WICRect rect = { 0, 0, width, height };
+	DWORD* pPixel = nullptr;
+
+	hr = pIBitmap->Lock(&rect, WICBitmapLockWrite, &pILock);
+
+	if (SUCCEEDED(hr))
+	{
+		UINT cbBufferSize = 0;
+		BYTE* pv = nullptr;
+
+		if (SUCCEEDED(hr))
+		{
+			hr = pILock->GetDataPointer(&cbBufferSize, &pv);
+
+			pPixel = (DWORD*)pv;
+
+			//pv[0] = 0,0 ÀÇ pixel r, g, b, a 
+			int r, g, b, a;
+			// ff ff 00 00
+		}
+
+		if (pILock) { pILock->Release(); pILock = nullptr; }
+	}
+
+	//hr = _pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, _pBitmap);
+	//if (FAILED(hr)) return hr;
 
 
 	if (pConverter) { pConverter->Release(); pConverter = nullptr; }

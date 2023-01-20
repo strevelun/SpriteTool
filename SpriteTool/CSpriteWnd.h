@@ -11,7 +11,6 @@
 class CSpriteWnd
 	: public CBWnd
 {
-	CBitmap* m_pImage = nullptr;
 	CMouse* m_pMouse = nullptr;
 
 public:
@@ -22,5 +21,6 @@ public:
 	LRESULT Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	void Render();
+	D2D1_RECT_F DetectSprite(HWND _hWnd, int _startPosX, int _startPosY, int _endPosX, int _endPosY);
 };
 

@@ -11,8 +11,6 @@ protected:
 	ID2D1HwndRenderTarget* m_pRenderTarget = nullptr;
 	ID2D1SolidColorBrush* m_pBlackBrush = nullptr;
 
-
-
 public:
 	CBWnd();
 	CBWnd(HINSTANCE _hInstance);

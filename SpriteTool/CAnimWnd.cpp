@@ -3,6 +3,7 @@
 #include "CApp.h"
 #include "CCore.h"
 #include "CBitmap.h"
+#include "CSprite.h"
 
 CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 {
@@ -12,15 +13,12 @@ CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 CAnimWnd::~CAnimWnd()
 {
 	if (m_pRenderTarget) m_pRenderTarget->Release();
-	delete m_pImage;
 }
 
 bool CAnimWnd::Create(int _width, int _height, int nCmdShow)
 {
 	if (CBWnd::Create(L"D2DTutWindowClassAnim", _width, _height, nCmdShow) == false)
 		return false;
-
-	m_pImage = new CBitmap();
 
 	InvalidateRgn(m_hWnd, NULL, true);
 
@@ -43,6 +41,7 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_MOUSEMOVE:
+		InvalidateRgn(hWnd, NULL, false);
 		break;
 
 	case WM_LBUTTONDOWN:
@@ -68,12 +67,21 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 void CAnimWnd::Render()
 {
 	if (!m_pRenderTarget)	return;
-	if (!m_pImage)			return;
+	//if (!m_pImage)			return;
 
 	m_pRenderTarget->BeginDraw();
 	m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-	m_pImage->Render(m_pRenderTarget);
+	//m_pImage->Render(m_pRenderTarget);
+
+	int pos = 0;
+
+	for (int i = 0; i < CBitmap::GetInst()->GetVecSpriteSize(); i++)
+	{
+		CSprite* sprite = CBitmap::GetInst()->GetVecSprite(i);
+		CBitmap::GetInst()->RenderSprite(m_pRenderTarget, i, pos);
+		pos += sprite->GetSize().right - sprite->GetSize().left;
+	}
 
 	m_pRenderTarget->EndDraw();
 }
