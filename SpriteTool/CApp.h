@@ -20,8 +20,8 @@ private:
 	HINSTANCE m_hInst = nullptr;
 	HWND m_hWnd = nullptr;
 
-	int m_mouseX, m_mouseY;
-	int m_mag = 100; // 확대, 축소 배율
+	//int m_mouseX, m_mouseY;
+	//int m_mag = 100; // 확대, 축소 배율
 
 	CAnimWnd* m_animWnd;
 	CSpriteWnd* m_spriteWnd;

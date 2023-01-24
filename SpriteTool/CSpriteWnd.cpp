@@ -8,6 +8,7 @@
 
 #include <stack>
 #include <windowsx.h>
+#include <string>
 
 #pragma comment( lib, "d2d1.lib " ) 
 
@@ -69,7 +70,10 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOUSEMOVE:
 	{
-		m_pMouse->UpdateMousePos(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		int xpos = GET_X_LPARAM(lParam);
+		int ypos = GET_Y_LPARAM(lParam);
+		m_pMouse->UpdateMousePos(xpos, ypos);
+		CBitmap::GetInst()->GetPixelColor(xpos, ypos);
 
 		InvalidateRgn(m_hWnd, NULL, false);
 		break;
@@ -81,11 +85,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_LBUTTONUP: 
-#ifdef _DEBUG
-		char str[100];
-		sprintf_s(str, "%d %d -> %d %d\n", m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(), m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
-		OutputDebugStringA(str);
-#endif
+
 
 		m_pMouse->UpdateClickState(false);
 		InvalidateRgn(m_hWnd, NULL, false);
@@ -140,6 +140,9 @@ void CSpriteWnd::Render()
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 	}
 
+	std::wstring wstr = CBitmap::GetInst()->GetPixelColor(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+	const WCHAR* strColor = wstr.c_str();
+	m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
 
 	m_pRenderTarget->EndDraw();
 }

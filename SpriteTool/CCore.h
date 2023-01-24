@@ -1,7 +1,6 @@
 #pragma once
 
 #include <d2d1.h>
-#include <dwrite.h>
 #include <wincodec.h>
 
 
@@ -43,5 +42,5 @@ public:
 	ID2D1HwndRenderTarget* CreateRenderTarget(HWND _hWnd);
 
 	void CleanupDevice();
-	HRESULT LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap);
+	DWORD* LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap);
 };

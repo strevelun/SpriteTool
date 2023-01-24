@@ -1,6 +1,7 @@
 #pragma once
 #include <d2d1.h>
 #include <vector>
+#include <string>
 
 class CSprite;
 
@@ -9,6 +10,8 @@ class CBitmap
 private:
 	static CBitmap* m_inst;
 	ID2D1Bitmap* m_bitmap = nullptr;
+	DWORD* m_bitmapPixel = nullptr;
+	int m_width, m_height;
 
 	std::vector<CSprite*> m_vecSprite;
 
@@ -48,5 +51,7 @@ public:
 
 	unsigned int GetVecSpriteSize() const { return m_vecSprite.size(); }
 	void ClearVecSprite();
+
+	std::wstring GetPixelColor(unsigned int _xpos, unsigned int _ypos);
 };
 

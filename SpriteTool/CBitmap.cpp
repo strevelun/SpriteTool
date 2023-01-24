@@ -1,7 +1,8 @@
 #include "CBitmap.h"
 #include "CCore.h"
 #include "CSprite.h"
-
+#include <sstream>
+#include <iomanip>
 #include <Windows.h>
 #include <stack>
 
@@ -54,7 +55,7 @@ void CBitmap::OpenFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 	}
 
 	ID2D1Bitmap* bitmap;
-	CCore::GetInst()->LoadBitmapFromFile(fileName, _pRenderTarget, &bitmap);
+	m_bitmapPixel = CCore::GetInst()->LoadBitmapFromFile(fileName, _pRenderTarget, &bitmap);
 	m_bitmap = bitmap;
 
 
@@ -92,4 +93,23 @@ void CBitmap::ClearVecSprite()
 	for (int i = 0; i < size; i++)
 		delete m_vecSprite[i];
 	m_vecSprite.clear();
+}
+
+std::wstring CBitmap::GetPixelColor(unsigned int _xpos, unsigned int _ypos)
+{
+	if(m_bitmapPixel == nullptr)	return L"";
+	if (_xpos >= 100 || _ypos >= 100) return L"";
+
+
+	std::wstringstream stream;
+	DWORD d = m_bitmapPixel[_ypos * 100 + _xpos];
+	stream << std::hex << d;
+	std::wstring result(stream.str());
+
+#ifdef _DEBUG
+	char str[100];
+	sprintf_s(str, "%s\n", result.c_str());
+	OutputDebugStringA(str);
+#endif
+	return result;
 }

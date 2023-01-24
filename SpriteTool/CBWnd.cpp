@@ -4,6 +4,8 @@
 #include <d2d1.h>
 #include "resource.h"
 
+#pragma comment(lib, "dwrite.lib")
+
 LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam);
 
 CBWnd::CBWnd()
@@ -50,6 +52,17 @@ bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow
 	
 	HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pBlackBrush);
 	if (FAILED(hr)) return false;
+
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_pDWriteFactory));
+	if (FAILED(hr)) return hr;
+
+	static const WCHAR fontName[] = L"Arial";
+	const FLOAT fontSize = 30.0f;
+
+	hr = m_pDWriteFactory->CreateTextFormat(fontName, NULL,
+		DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+		fontSize, L"en-us", &m_pDWTextFormat);
+	if (FAILED(hr)) return hr;
 
 	ShowWindow(m_hWnd, nCmdShow);
 	UpdateWindow(m_hWnd);

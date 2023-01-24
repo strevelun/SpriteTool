@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <d2d1.h>
+#include <dwrite.h>
 
 class CBWnd
 {
@@ -10,6 +11,9 @@ protected:
 	HINSTANCE m_hInst;
 	ID2D1HwndRenderTarget* m_pRenderTarget = nullptr;
 	ID2D1SolidColorBrush* m_pBlackBrush = nullptr;
+
+	IDWriteFactory* m_pDWriteFactory = nullptr;
+	IDWriteTextFormat* m_pDWTextFormat = nullptr;
 
 public:
 	CBWnd();

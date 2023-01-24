@@ -1,9 +1,9 @@
 #include "CCore.h"
+#include "CBitmap.h"
 
 CCore* CCore::m_inst = nullptr;
 
 #pragma comment(lib, "d2d1.lib")
-#pragma comment(lib, "dwrite.lib")
 #pragma comment(lib, "windowscodecs.lib")
 
 CCore::CCore()
@@ -25,31 +25,29 @@ HRESULT CCore::InitDevice()
 	hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pWICFactory));
 	if (FAILED(hr)) return hr;
 
-	
-
 	return hr;
 }
 
 
 //https://learn.microsoft.com/ko-kr/windows/win32/wic/-wic-bitmapsources-howto-modifypixels?redirectedfrom=MSDN
-HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap)
+DWORD* CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap)
 {
 	HRESULT hr = S_OK;
 	IWICBitmapDecoder* pDecoder = nullptr;
 
 	hr = m_pWICFactory->CreateDecoderFromFilename(_wcFileName, NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) return nullptr;
 
 	IWICBitmapFrameDecode* pFrame = nullptr;
 	hr = pDecoder->GetFrame(0, &pFrame);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) return nullptr;
 
 	IWICFormatConverter* pConverter = nullptr;
 	hr = m_pWICFactory->CreateFormatConverter(&pConverter);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) return nullptr;
 
 	hr = pConverter->Initialize(pFrame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) return nullptr;
 
 	IWICBitmap* pIBitmap = nullptr;
 	IWICBitmapLock* pILock = nullptr;
@@ -59,6 +57,8 @@ HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pR
 	pIBitmap->GetSize(&width, &height);
 	WICRect rect = { 0, 0, width, height };
 	DWORD* pPixel = nullptr;
+
+	_pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, _pBitmap);
 
 	hr = pIBitmap->Lock(&rect, WICBitmapLockWrite, &pILock);
 
@@ -72,10 +72,9 @@ HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pR
 			hr = pILock->GetDataPointer(&cbBufferSize, &pv);
 
 			pPixel = (DWORD*)pv;
-
 			//pv[0] = 0,0 ÀÇ pixel r, g, b, a 
-			int r, g, b, a;
 			// ff ff 00 00
+			return pPixel;
 		}
 
 		if (pILock) { pILock->Release(); pILock = nullptr; }
@@ -89,7 +88,7 @@ HRESULT CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pR
 	if (pFrame) { pFrame->Release(); pFrame = nullptr; }
 	if (pDecoder) { pDecoder->Release(); pDecoder = nullptr; }
 
-	return hr;
+	return nullptr;
 }
 
 
