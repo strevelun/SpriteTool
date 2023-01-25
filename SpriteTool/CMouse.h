@@ -14,11 +14,9 @@ public:
 	int GetMouseY() const { return m_mouseY; }
 	int GetStartMouseX() const { return m_startMouseX; }
 	int GetStartMouseY() const { return m_startMouseY; }
+	bool GetClickState() const { return m_isClicked; }
 
-	void UpdateMousePos(int _xpos, int _ypos) { 
-		//if (m_isClicked) { 
-			m_mouseX = _xpos, m_mouseY = _ypos; 
-		}
+	void UpdateMousePos(int _xpos, int _ypos) { m_mouseX = _xpos, m_mouseY = _ypos; }
 	void UpdateMouseStartPos(int _xpos, int _ypos) { m_startMouseX = _xpos; m_startMouseY = _ypos; }
 	void UpdateClickState(bool _isClicked) { m_isClicked = _isClicked; }
 	void Render(ID2D1HwndRenderTarget* _pRenderTarget, ID2D1SolidColorBrush* _pBlackBrush)

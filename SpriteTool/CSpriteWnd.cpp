@@ -49,13 +49,14 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case ID_LOAD_IMAGE:
-
 			CBitmap::GetInst()->OpenFile(hWnd, m_pRenderTarget);
-			/*
-			CAnimWnd* animWnd = CApp::GetInst()->GetAnimWnd();
-			animWnd->GetBitmap()->SetBitmap(m_pImage->GetBitmap());
-			InvalidateRgn(animWnd->GetHwnd(), NULL, true);
-			*/
+			break;
+		case ID_AUTO_SLICE:
+
+			break;
+		case ID_DRAG_SLICE:
+			break;
+		case ID_ADD_CLIP:
 			break;
 		}
 		break;
@@ -73,11 +74,10 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		int xpos = GET_X_LPARAM(lParam);
 		int ypos = GET_Y_LPARAM(lParam);
 		m_pMouse->UpdateMousePos(xpos, ypos);
-		CBitmap::GetInst()->GetPixelColor(xpos, ypos);
+		CBitmap::GetInst()->GetPixelColorString(xpos, ypos);
 
 		InvalidateRgn(m_hWnd, NULL, false);
 		break;
-
 	}
 	case WM_LBUTTONDOWN: 
 		m_pMouse->UpdateMouseStartPos(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -85,7 +85,8 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_LBUTTONUP: 
-
+		// LBUTTONDOWN 한 적이 없으면 break. 이미지 열기할 때 들어옴
+		if (m_pMouse->GetClickState() == false) break;
 
 		m_pMouse->UpdateClickState(false);
 		InvalidateRgn(m_hWnd, NULL, false);
@@ -140,7 +141,7 @@ void CSpriteWnd::Render()
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 	}
 
-	std::wstring wstr = CBitmap::GetInst()->GetPixelColor(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+	std::wstring wstr = CBitmap::GetInst()->GetPixelColorString(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
 	const WCHAR* strColor = wstr.c_str();
 	m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
 

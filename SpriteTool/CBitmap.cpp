@@ -55,9 +55,8 @@ void CBitmap::OpenFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 	}
 
 	ID2D1Bitmap* bitmap;
-	m_bitmapPixel = CCore::GetInst()->LoadBitmapFromFile(fileName, _pRenderTarget, &bitmap);
+	m_bitmapPixel = CCore::GetInst()->LoadBitmapFromFile(fileName, _pRenderTarget, &bitmap, &m_size);
 	m_bitmap = bitmap;
-
 
 	InvalidateRgn(_hWnd, NULL, true);
 }
@@ -95,21 +94,25 @@ void CBitmap::ClearVecSprite()
 	m_vecSprite.clear();
 }
 
-std::wstring CBitmap::GetPixelColor(unsigned int _xpos, unsigned int _ypos)
+std::wstring CBitmap::GetPixelColorString(unsigned int _xpos, unsigned int _ypos)
 {
 	if(m_bitmapPixel == nullptr)	return L"";
-	if (_xpos >= 100 || _ypos >= 100) return L"";
-
+	if (_xpos >= m_size.width || _ypos >= m_size.height) return L"";
 
 	std::wstringstream stream;
-	DWORD d = m_bitmapPixel[_ypos * 100 + _xpos];
+	DWORD d = m_bitmapPixel[_ypos * (int)m_size.width + _xpos];
 	stream << std::hex << d;
 	std::wstring result(stream.str());
 
 #ifdef _DEBUG
 	char str[100];
-	sprintf_s(str, "%s\n", result.c_str());
+	sprintf_s(str, "%ls\n", result.c_str());
 	OutputDebugStringA(str);
 #endif
 	return result;
+}
+
+void CBitmap::AutoSliceSprite()
+{
+
 }

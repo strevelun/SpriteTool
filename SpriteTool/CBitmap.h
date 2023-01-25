@@ -11,7 +11,7 @@ private:
 	static CBitmap* m_inst;
 	ID2D1Bitmap* m_bitmap = nullptr;
 	DWORD* m_bitmapPixel = nullptr;
-	int m_width, m_height;
+	D2D1_SIZE_F m_size;
 
 	std::vector<CSprite*> m_vecSprite;
 
@@ -52,6 +52,8 @@ public:
 	unsigned int GetVecSpriteSize() const { return m_vecSprite.size(); }
 	void ClearVecSprite();
 
-	std::wstring GetPixelColor(unsigned int _xpos, unsigned int _ypos);
+	std::wstring GetPixelColorString(unsigned int _xpos, unsigned int _ypos);
+
+	void AutoSliceSprite();
 };
 

@@ -30,7 +30,7 @@ HRESULT CCore::InitDevice()
 
 
 //https://learn.microsoft.com/ko-kr/windows/win32/wic/-wic-bitmapsources-howto-modifypixels?redirectedfrom=MSDN
-DWORD* CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap)
+DWORD* CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap, D2D1_SIZE_F* _size)
 {
 	HRESULT hr = S_OK;
 	IWICBitmapDecoder* pDecoder = nullptr;
@@ -57,6 +57,9 @@ DWORD* CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRe
 	pIBitmap->GetSize(&width, &height);
 	WICRect rect = { 0, 0, width, height };
 	DWORD* pPixel = nullptr;
+
+	_size->width = width;
+	_size->height = height;
 
 	_pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, _pBitmap);
 
