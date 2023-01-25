@@ -53,6 +53,9 @@ bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow
 	HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pBlackBrush);
 	if (FAILED(hr)) return false;
 
+	hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &m_pRedBrush);
+	if (FAILED(hr)) return false;
+
 	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_pDWriteFactory));
 	if (FAILED(hr)) return hr;
 

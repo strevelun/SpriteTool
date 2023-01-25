@@ -11,6 +11,7 @@ protected:
 	HINSTANCE m_hInst;
 	ID2D1HwndRenderTarget* m_pRenderTarget = nullptr;
 	ID2D1SolidColorBrush* m_pBlackBrush = nullptr;
+	ID2D1SolidColorBrush* m_pRedBrush = nullptr;
 
 	IDWriteFactory* m_pDWriteFactory = nullptr;
 	IDWriteTextFormat* m_pDWTextFormat = nullptr;

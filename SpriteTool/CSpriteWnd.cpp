@@ -52,11 +52,26 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			CBitmap::GetInst()->OpenFile(hWnd, m_pRenderTarget);
 			break;
 		case ID_AUTO_SLICE:
-
+			m_mode = MouseMode::AutoSlice;
+			CBitmap::GetInst()->AutoSliceSprite();
 			break;
 		case ID_DRAG_SLICE:
+			m_mode = MouseMode::DragSlice;
 			break;
 		case ID_ADD_CLIP:
+			m_mode = MouseMode::AddClip;
+			break;
+		case ID_KEY_COLOR:
+			break;
+		case ID_SPRITE:
+			m_mode = MouseMode::RemoveSprite;
+
+			break;
+		case ID_ALL_BOXES:
+			CBitmap::GetInst()->ClearVecSprite();
+			CBitmap::GetInst()->ClearVecClip();
+			InvalidateRgn(m_hWnd, NULL, false);
+
 			break;
 		}
 		break;
@@ -89,20 +104,17 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (m_pMouse->GetClickState() == false) break;
 
 		m_pMouse->UpdateClickState(false);
+
+		if (m_mode == MouseMode::DragSlice)
+			CBitmap::GetInst()->DragSprite(m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
+				m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+		else if (m_mode == MouseMode::RemoveSprite)
+			CBitmap::GetInst()->RemoveSprite(m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
+				m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+		else if (m_mode == MouseMode::AddClip)
+			CBitmap::GetInst()->AddClip(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+
 		InvalidateRgn(m_hWnd, NULL, false);
-		D2D1_RECT_F rect = DetectSprite(hWnd, m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
-			m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
-
-		if (rect.right == 0)
-		{
-			CBitmap::GetInst()->ClearVecSprite();
-			break;
-		}
-
-		m_pRenderTarget->BeginDraw();
-		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
-		m_pRenderTarget->EndDraw();
-
 		break;
 
 	case WM_MOUSEWHEEL:
@@ -130,9 +142,10 @@ void CSpriteWnd::Render()
 	m_pRenderTarget->BeginDraw();
 	m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-	//m_pImage->Render(m_pRenderTarget);
 	CBitmap::GetInst()->Render(m_pRenderTarget);
-	m_pMouse->Render(m_pRenderTarget, m_pBlackBrush);
+
+	if(m_mode == MouseMode::DragSlice || m_mode == MouseMode::RemoveSprite)
+		m_pMouse->Render(m_pRenderTarget, m_pBlackBrush);
 
 	for(int i=0; i< CBitmap::GetInst()->GetVecSpriteSize(); i++)
 	{
@@ -141,13 +154,20 @@ void CSpriteWnd::Render()
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 	}
 
+	for (int i = 0; i < CBitmap::GetInst()->GetVecClipSize(); i++)
+	{
+		CSprite* sprite = CBitmap::GetInst()->GetVecClip(i);
+		D2D1_RECT_F rect = sprite->GetSize();
+		m_pRenderTarget->DrawRectangle(rect, m_pRedBrush);
+	}
+
 	std::wstring wstr = CBitmap::GetInst()->GetPixelColorString(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
 	const WCHAR* strColor = wstr.c_str();
 	m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
 
 	m_pRenderTarget->EndDraw();
 }
-
+/*
 D2D1_RECT_F CSpriteWnd::DetectSprite(HWND _hWnd, int _startPosX, int _startPosY, int _endPosX, int _endPosY)
 {
 	if (_startPosX > _endPosX)
@@ -205,3 +225,4 @@ D2D1_RECT_F CSpriteWnd::DetectSprite(HWND _hWnd, int _startPosX, int _startPosY,
 	ReleaseDC(_hWnd, hdc);
 	return rect;
 }
+*/

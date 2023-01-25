@@ -58,9 +58,15 @@ BEGIN
     END
     POPUP "편집"
     BEGIN
-        MENUITEM "AutoSlice",                   ID_40002
-        MENUITEM "DragSlice",                   ID_40003
-        MENUITEM "AddClip",                     ID_40004
+        MENUITEM "AutoSlice",                   ID_AUTO_SLICE
+        MENUITEM "DragSlice",                   ID_DRAG_SLICE
+        MENUITEM "AddClip",                     ID_ADD_CLIP
+    END
+    POPUP "삭제"
+    BEGIN
+        MENUITEM "KeyColor",                    ID_KEY_COLOR
+        MENUITEM "Sprite",                      ID_SPRITE
+        MENUITEM "AllBoxes",                    ID_ALL_BOXES
     END
 END
 

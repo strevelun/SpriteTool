@@ -14,9 +14,13 @@ private:
 	D2D1_SIZE_F m_size;
 
 	std::vector<CSprite*> m_vecSprite;
+	std::vector<CSprite*> m_vecClip;
 
+private:
 	CBitmap();
 	~CBitmap();
+
+	void Find(std::vector<std::vector<bool>>& _visited, int _curX, int _curY);
 
 public:
 	static CBitmap* GetInst() 
@@ -48,12 +52,22 @@ public:
 		if (idx >= m_vecSprite.size()) return nullptr;
 		return m_vecSprite[idx]; 
 	}
+	CSprite* GetVecClip(unsigned int idx) const
+	{
+		if (idx >= m_vecClip.size()) return nullptr;
+		return m_vecClip[idx];
+	}
 
 	unsigned int GetVecSpriteSize() const { return m_vecSprite.size(); }
+	unsigned int GetVecClipSize() const { return m_vecClip.size(); }
 	void ClearVecSprite();
+	void ClearVecClip();
 
 	std::wstring GetPixelColorString(unsigned int _xpos, unsigned int _ypos);
 
 	void AutoSliceSprite();
+	void DragSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
+	void RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
+	void AddClip(int _xpos, int _ypos);
 };
 

@@ -76,9 +76,9 @@ void CAnimWnd::Render()
 
 	int pos = 0;
 
-	for (int i = 0; i < CBitmap::GetInst()->GetVecSpriteSize(); i++)
+	for (int i = 0; i < CBitmap::GetInst()->GetVecClipSize(); i++)
 	{
-		CSprite* sprite = CBitmap::GetInst()->GetVecSprite(i);
+		CSprite* sprite = CBitmap::GetInst()->GetVecClip(i);
 		CBitmap::GetInst()->RenderSprite(m_pRenderTarget, i, pos);
 		pos += sprite->GetSize().right - sprite->GetSize().left;
 	}
