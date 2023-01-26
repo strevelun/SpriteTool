@@ -6,11 +6,13 @@
 
 class CBitmap;
 class CAnimViewWnd;
+class CSprite;
 
 class CAnimWnd : public CBWnd
 {
 	CBitmap* m_pImage = nullptr;
 	CAnimViewWnd* m_viewWnd = nullptr;
+	CSprite* m_curClickedSprite = nullptr;
 
 public:
 	CAnimWnd(HINSTANCE _hInstance);

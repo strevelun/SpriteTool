@@ -74,7 +74,7 @@ void CBitmap::Find(std::vector<std::vector<bool>>& _visited, int _curX, int _cur
 	}
 
 	CSprite* sprite = new CSprite(rect);
-	CBitmap::GetInst()->AddSprite(sprite);
+	AddSprite(sprite);
 }
 
 void CBitmap::OpenFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
@@ -165,6 +165,7 @@ void CBitmap::ClearVecSpriteAndClip()
 		delete m_vecSprite[i];
 	m_vecSprite.clear();
 	m_vecClip.clear();
+	m_pos = 0;
 }
 
 std::wstring CBitmap::GetPixelColorString(unsigned int _xpos, unsigned int _ypos)
@@ -310,7 +311,9 @@ void CBitmap::RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _en
 			D2D1_RECT_F r = m_vecSprite[i]->GetSize();
 			if (rect.left <= r.left && rect.top <= r.top && rect.right >= r.right && rect.bottom >= r.bottom)
 			{
+				// delete m_vecSprite.begin() + i;
 				m_vecSprite.erase(m_vecSprite.begin() + i);
+				m_pos -= r.right - r.left;
 			}
 		}
 	}
@@ -321,7 +324,7 @@ void CBitmap::AddClip(int _xpos, int _ypos)
 {
 	for (int i = 0; i < m_vecSprite.size(); i++)
 	{
-		CSprite *sprite = m_vecSprite[i];
+		CSprite* sprite = m_vecSprite[i]; // AnimWnd에 있는 클립들의 Rect는 다름
 		D2D1_RECT_F rect = sprite->GetSize();
 		if (rect.left <= _xpos && _xpos <= rect.right && rect.top <= _ypos && rect.bottom >= _ypos)
 		{
@@ -330,4 +333,35 @@ void CBitmap::AddClip(int _xpos, int _ypos)
 		}
 
 	}
+}
+
+CSprite* CBitmap::GetClipInPos(int _xpos, int _ypos, D2D1_RECT_F& _r)
+{
+	size_t size = m_vecClip.size();
+	if (size <= 0) return {};
+
+	CSprite* sprite = nullptr;
+	int totalWidth = 0;
+
+	for (int i = 0; i < size; i++)
+	{
+		sprite = m_vecClip[i];
+		D2D1_RECT_F rect = sprite->GetSize();
+		int width = rect.right - rect.left;
+		int height = rect.bottom - rect.top;
+
+		// top은 항상 0이고 left는 totalWidth
+
+		if (totalWidth <= _xpos && totalWidth + width >= _xpos && 0 <= _ypos && height >= _ypos)
+		{
+			_r.left = totalWidth;
+			_r.right = totalWidth + width;
+			_r.top = 0;
+			_r.bottom = height;
+			break;
+		}
+		totalWidth += width;
+	}
+
+	return sprite;
 }

@@ -6,6 +6,7 @@
 #include "CSprite.h"
 #include "resource.h"
 #include "CAnimViewWnd.h"
+#include <windowsx.h>
 
 CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 {
@@ -54,12 +55,33 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_MOUSEMOVE:
+	{
 		InvalidateRgn(hWnd, NULL, false);
-		break;
 
+		if (m_curClickedSprite)
+		{
+
+		}
+		break;
+	}
 	case WM_LBUTTONDOWN:
-		break;
+	{
+		int xpos = GET_X_LPARAM(lParam);
+		int ypos = GET_Y_LPARAM(lParam);
 
+		D2D1_RECT_F rect;
+		CSprite* sprite = CBitmap::GetInst()->GetClipInPos(xpos, ypos, rect);
+		if (sprite != nullptr)
+		{
+			float pivotX = (xpos - rect.left) / (float)(rect.right - rect.left);
+			float pivotY = (ypos - rect.top) / (float)(rect.bottom - rect.top);
+			sprite->SetPivotX(pivotX);
+			sprite->SetPivotY(pivotY);
+		}
+		
+
+		break;
+	}
 	case WM_RBUTTONDOWN:
 		break;
 
@@ -91,17 +113,22 @@ void CAnimWnd::Render()
 
 	for (int i = 0; i < CBitmap::GetInst()->GetVecClipSize(); i++)
 	{
-		CSprite* sprite = CBitmap::GetInst()->GetVecClip(i);
+		CSprite* clip = CBitmap::GetInst()->GetVecClip(i);
 		CBitmap::GetInst()->RenderClip(m_pRenderTarget, i, pos);
-		D2D1_RECT_F rect = sprite->GetSize();
+		D2D1_RECT_F rect = clip->GetSize();
 		rect.left = pos;
 		rect.bottom -= rect.top;
 		rect.top = 0;
-		pos += sprite->GetSize().right - sprite->GetSize().left;
+		pos += clip->GetSize().right - clip->GetSize().left;
 		rect.right = pos;
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 
-
+		D2D1_RECT_F dot;
+		dot.left = rect.left + (rect.right - rect.left) * clip->GetPivotX();
+		dot.top = rect.top + (rect.bottom - rect.top) * clip->GetPivotY();
+		dot.right = dot.left + 2;
+		dot.bottom = dot.top + 2;
+		m_pRenderTarget->DrawRectangle(dot, m_pRedBrush, 2);
 	}
 
 	m_pRenderTarget->EndDraw();

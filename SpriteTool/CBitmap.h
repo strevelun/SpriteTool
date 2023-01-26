@@ -16,6 +16,8 @@ private:
 	std::vector<CSprite*> m_vecSprite;
 	std::vector<CSprite*> m_vecClip;
 
+	int m_pos = 0;
+
 private:
 	CBitmap();
 	~CBitmap();
@@ -69,5 +71,7 @@ public:
 	void DragSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
 	void RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
 	void AddClip(int _xpos, int _ypos);
+
+	CSprite* GetClipInPos(int _xpos, int _ypos, D2D1_RECT_F& _r);
 };
 
