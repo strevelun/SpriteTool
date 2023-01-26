@@ -26,7 +26,8 @@ CSpriteWnd::~CSpriteWnd()
 
 bool CSpriteWnd::Create(int _width, int _height, int nCmdShow)
 {
-	if (CBWnd::Create(L"D2DTutWindowClassSprite", _width, _height, nCmdShow, IDR_MENU1) == false)
+	if (CBWnd::Create(L"D2DTutWindowClassSprite", _width, _height, nCmdShow,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, IDR_MENU1) == false)
 		return false;
 
 	m_pMouse = new CMouse();

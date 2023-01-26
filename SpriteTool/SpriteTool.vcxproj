@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CAnimViewWnd.cpp" />
     <ClCompile Include="CAnimWnd.cpp" />
     <ClCompile Include="CApp.cpp" />
     <ClCompile Include="CBitmap.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="SpriteTool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CAnimViewWnd.h" />
     <ClInclude Include="CAnimWnd.h" />
     <ClInclude Include="CApp.h" />
     <ClInclude Include="CBitmap.h" />

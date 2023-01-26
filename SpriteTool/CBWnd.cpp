@@ -22,7 +22,7 @@ CBWnd::~CBWnd()
 {
 }
 
-bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow, int _menu)
+bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow, DWORD _dwStyle, int _menu)
 {
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -42,8 +42,7 @@ bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow
 
 	RECT rc = { 0, 0, _width, _height };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-	m_hWnd = CreateWindow(_lpszClassName, L"SpriteTool",
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+	m_hWnd = CreateWindow(_lpszClassName, L"SpriteTool", _dwStyle,
 		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, m_hInst,
 		this);
 	if (!m_hWnd) return false;

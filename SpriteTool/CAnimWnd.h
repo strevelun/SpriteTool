@@ -5,10 +5,12 @@
 #include "CBWnd.h"
 
 class CBitmap;
+class CAnimViewWnd;
 
 class CAnimWnd : public CBWnd
 {
 	CBitmap* m_pImage = nullptr;
+	CAnimViewWnd* m_viewWnd = nullptr;
 
 public:
 	CAnimWnd(HINSTANCE _hInstance);

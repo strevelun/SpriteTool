@@ -146,6 +146,8 @@ void CBitmap::RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx
 
 	_pRenderTarget->DrawBitmap(m_bitmap, D2D1::RectF(_x, _y, m_vecClip[idx]->GetSize().right - m_vecClip[idx]->GetSize().left + _x, m_vecClip[idx]->GetSize().bottom - m_vecClip[idx]->GetSize().top + _y), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
 		D2D1::RectF(m_vecClip[idx]->GetSize().left, m_vecClip[idx]->GetSize().top, m_vecClip[idx]->GetSize().right, m_vecClip[idx]->GetSize().bottom));
+
+
 }
 
 void CBitmap::AddSprite(CSprite* _sprite)

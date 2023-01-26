@@ -5,6 +5,7 @@
 #include "CBitmap.h"
 #include "CSprite.h"
 #include "resource.h"
+#include "CAnimViewWnd.h"
 
 CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 {
@@ -18,7 +19,8 @@ CAnimWnd::~CAnimWnd()
 
 bool CAnimWnd::Create(int _width, int _height, int nCmdShow)
 {
-	if (CBWnd::Create(L"D2DTutWindowClassAnim", _width, _height, nCmdShow, IDR_MENU2) == false)
+	if (CBWnd::Create(L"D2DTutWindowClassAnim", _width, _height, nCmdShow,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, IDR_MENU2) == false)
 		return false;
 
 	InvalidateRgn(m_hWnd, NULL, true);
@@ -39,7 +41,8 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case ID_PIVOT:
 			break;
 		case ID_ANIMATION:
-
+			m_viewWnd = new CAnimViewWnd(NULL);
+			m_viewWnd->Create(500, 500, SW_SHOWNORMAL);
 			break;
 		}
 	case WM_PAINT:
@@ -97,6 +100,8 @@ void CAnimWnd::Render()
 		pos += sprite->GetSize().right - sprite->GetSize().left;
 		rect.right = pos;
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
+
+
 	}
 
 	m_pRenderTarget->EndDraw();
