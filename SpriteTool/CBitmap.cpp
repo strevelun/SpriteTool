@@ -292,6 +292,16 @@ void CBitmap::RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _en
 		D2D1_RECT_F r = m_vecSprite[i]->GetSize();
 		if(_startPosX <= r.left && r.right <= _endPosX && _startPosY <= r.top && _endPosY >= r.bottom)
 		{
+			for (int j = 0; j < m_vecClip.size(); j++)
+			{
+				D2D1_RECT_F r2 = m_vecClip[j]->GetSize();
+				if (r.left == r2.left && r.top == r2.top && r.right == r2.right && r.bottom == r2.bottom)
+				{
+					m_vecClip.erase(m_vecClip.begin() + j);
+					break;
+				}
+			}
+
 			delete m_vecSprite[i];
 			m_vecSprite.erase(m_vecSprite.begin() + i);
 			i--; // 벡터 원소 지우면서 크기 변화때문에 스킵하는 원소 발생 방지
