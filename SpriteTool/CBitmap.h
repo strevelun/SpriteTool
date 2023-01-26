@@ -16,8 +16,6 @@ private:
 	std::vector<CSprite*> m_vecSprite;
 	std::vector<CSprite*> m_vecClip;
 
-	int m_pos = 0;
-
 private:
 	CBitmap();
 	~CBitmap();

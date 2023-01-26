@@ -177,7 +177,6 @@ void CBitmap::ClearVecSpriteAndClip()
 		delete m_vecSprite[i];
 	m_vecSprite.clear();
 	m_vecClip.clear();
-	m_pos = 0;
 }
 
 std::wstring CBitmap::GetPixelColorString(unsigned int _xpos, unsigned int _ypos)
@@ -287,49 +286,17 @@ void CBitmap::RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _en
 		_startPosY = _endPosY;
 		_endPosY = t;
 	}
-
-	D2D1_RECT_F rect = { 0 };
-	int minX = 999999, minY = 999999;
-	int maxX = 0, maxY = 0;
-
-	for (int i = _startPosY + 1; i < _endPosY - 1; i++)
+	
+	for (int i = 0; i < m_vecSprite.size(); i++)
 	{
-		for (int j = _startPosX + 1; j < _endPosX - 1; j++)
+		D2D1_RECT_F r = m_vecSprite[i]->GetSize();
+		if(_startPosX <= r.left && r.right <= _endPosX && _startPosY <= r.top && _endPosY >= r.bottom)
 		{
-
-			if (m_bitmapPixel[i * (int)m_size.width + j] != 4294967295)
-			{
-				if (minX > j)
-					minX = j;
-				if (maxX < j)
-					maxX = j;
-				if (minY > i)
-					minY = i;
-				if (maxY < i)
-					maxY = i;
-			}
+			delete m_vecSprite[i];
+			m_vecSprite.erase(m_vecSprite.begin() + i);
+			i--; // 벡터 원소 지우면서 크기 변화때문에 스킵하는 원소 발생 방지
 		}
 	}
-
-	if (minX < maxX)
-	{
-		rect.left = minX;
-		rect.top = minY;
-		rect.right = maxX;
-		rect.bottom = maxY;
-
-		for (int i = 0; i < m_vecSprite.size(); i++)
-		{
-			D2D1_RECT_F r = m_vecSprite[i]->GetSize();
-			if (rect.left <= r.left && rect.top <= r.top && rect.right >= r.right && rect.bottom >= r.bottom)
-			{
-				// delete m_vecSprite.begin() + i;
-				m_vecSprite.erase(m_vecSprite.begin() + i);
-				m_pos -= r.right - r.left;
-			}
-		}
-	}
-
 }
 
 void CBitmap::AddClip(int _xpos, int _ypos)
