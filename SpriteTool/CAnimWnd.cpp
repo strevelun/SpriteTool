@@ -90,7 +90,13 @@ void CAnimWnd::Render()
 	{
 		CSprite* sprite = CBitmap::GetInst()->GetVecClip(i);
 		CBitmap::GetInst()->RenderClip(m_pRenderTarget, i, pos);
+		D2D1_RECT_F rect = sprite->GetSize();
+		rect.left = pos;
+		rect.bottom -= rect.top;
+		rect.top = 0;
 		pos += sprite->GetSize().right - sprite->GetSize().left;
+		rect.right = pos;
+		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 	}
 
 	m_pRenderTarget->EndDraw();
