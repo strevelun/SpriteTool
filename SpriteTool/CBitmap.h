@@ -44,6 +44,7 @@ public:
 	void SetBitmap(ID2D1Bitmap* _bitmap) { m_bitmap = _bitmap; }
 	void Render(ID2D1HwndRenderTarget* _pRenderTarget, float _x = 0.f, float _y = 0.f);
 	void RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f);
+	void RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f);
 
 	void AddSprite(CSprite* _sprite);
 	
@@ -60,8 +61,7 @@ public:
 
 	unsigned int GetVecSpriteSize() const { return m_vecSprite.size(); }
 	unsigned int GetVecClipSize() const { return m_vecClip.size(); }
-	void ClearVecSprite();
-	void ClearVecClip();
+	void ClearVecSpriteAndClip();
 
 	std::wstring GetPixelColorString(unsigned int _xpos, unsigned int _ypos);
 

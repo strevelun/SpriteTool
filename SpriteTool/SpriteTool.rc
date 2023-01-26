@@ -70,6 +70,18 @@ BEGIN
     END
 END
 
+IDR_MENU2 MENU
+BEGIN
+    POPUP "편집"
+    BEGIN
+        MENUITEM "피벗",                          ID_PIVOT
+    END
+    POPUP "보기"
+    BEGIN
+        MENUITEM "애니메이션",                       ID_ANIMATION
+    END
+END
+
 #endif    // 한국어(대한민국) resources
 /////////////////////////////////////////////////////////////////////////////
 

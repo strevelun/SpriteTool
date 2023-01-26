@@ -22,7 +22,7 @@ CBWnd::~CBWnd()
 {
 }
 
-bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow)
+bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow, int _menu)
 {
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -34,7 +34,7 @@ bool CBWnd::Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow
 	wcex.hIcon = LoadIcon(m_hInst, IDI_APPLICATION);
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = MAKEINTRESOURCE(IDR_MENU1);
+	wcex.lpszMenuName = MAKEINTRESOURCE(_menu);
 	wcex.lpszClassName = _lpszClassName;
 	wcex.hIconSm = LoadIcon(m_hInst, IDI_APPLICATION);
 

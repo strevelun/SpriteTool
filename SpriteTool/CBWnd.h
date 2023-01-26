@@ -21,7 +21,7 @@ public:
 	CBWnd(HINSTANCE _hInstance);
 	virtual ~CBWnd();
 
-	bool Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow) ;
+	bool Create(LPCWSTR _lpszClassName, int _width, int _height, int nCmdShow, int _menu) ;
 	virtual void Render();
 
 	virtual LRESULT Proc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam) {

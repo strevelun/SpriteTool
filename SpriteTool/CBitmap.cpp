@@ -139,12 +139,21 @@ void CBitmap::RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int i
 		D2D1::RectF(m_vecSprite[idx]->GetSize().left, m_vecSprite[idx]->GetSize().top, m_vecSprite[idx]->GetSize().right, m_vecSprite[idx]->GetSize().bottom));
 }
 
+void CBitmap::RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x, float _y)
+{
+	if (!m_bitmap) return;
+	if (idx >= m_vecClip.size()) return;
+
+	_pRenderTarget->DrawBitmap(m_bitmap, D2D1::RectF(_x, _y, m_vecClip[idx]->GetSize().right - m_vecClip[idx]->GetSize().left + _x, m_vecClip[idx]->GetSize().bottom - m_vecClip[idx]->GetSize().top + _y), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+		D2D1::RectF(m_vecClip[idx]->GetSize().left, m_vecClip[idx]->GetSize().top, m_vecClip[idx]->GetSize().right, m_vecClip[idx]->GetSize().bottom));
+}
+
 void CBitmap::AddSprite(CSprite* _sprite)
 {
 	m_vecSprite.push_back(_sprite);
 }
 
-void CBitmap::ClearVecSprite()
+void CBitmap::ClearVecSpriteAndClip()
 {
 	int size = m_vecSprite.size();
 
@@ -153,18 +162,7 @@ void CBitmap::ClearVecSprite()
 	for (int i = 0; i < size; i++)
 		delete m_vecSprite[i];
 	m_vecSprite.clear();
-}
-
-void CBitmap::ClearVecClip()
-{
-	int size = m_vecClip.size();
-
-	if (size <= 0) return;
-
-	for (int i = 0; i < size; i++)
-		delete m_vecClip[i];
 	m_vecClip.clear();
-
 }
 
 std::wstring CBitmap::GetPixelColorString(unsigned int _xpos, unsigned int _ypos)
@@ -325,11 +323,6 @@ void CBitmap::AddClip(int _xpos, int _ypos)
 		D2D1_RECT_F rect = sprite->GetSize();
 		if (rect.left <= _xpos && _xpos <= rect.right && rect.top <= _ypos && rect.bottom >= _ypos)
 		{
-#ifdef _DEBUG
-			char str[100];
-			sprintf_s(str, "dsadasd\n");
-			OutputDebugStringA(str);
-#endif
 			m_vecClip.push_back(sprite);
 			break;
 		}

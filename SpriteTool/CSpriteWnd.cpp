@@ -26,7 +26,7 @@ CSpriteWnd::~CSpriteWnd()
 
 bool CSpriteWnd::Create(int _width, int _height, int nCmdShow)
 {
-	if (CBWnd::Create(L"D2DTutWindowClassSprite", _width, _height, nCmdShow) == false)
+	if (CBWnd::Create(L"D2DTutWindowClassSprite", _width, _height, nCmdShow, IDR_MENU1) == false)
 		return false;
 
 	m_pMouse = new CMouse();
@@ -68,8 +68,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			break;
 		case ID_ALL_BOXES:
-			CBitmap::GetInst()->ClearVecSprite();
-			CBitmap::GetInst()->ClearVecClip();
+			CBitmap::GetInst()->ClearVecSpriteAndClip();
 			InvalidateRgn(m_hWnd, NULL, false);
 
 			break;

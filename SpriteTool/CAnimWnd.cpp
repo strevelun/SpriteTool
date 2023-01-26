@@ -4,6 +4,7 @@
 #include "CCore.h"
 #include "CBitmap.h"
 #include "CSprite.h"
+#include "resource.h"
 
 CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 {
@@ -17,7 +18,7 @@ CAnimWnd::~CAnimWnd()
 
 bool CAnimWnd::Create(int _width, int _height, int nCmdShow)
 {
-	if (CBWnd::Create(L"D2DTutWindowClassAnim", _width, _height, nCmdShow) == false)
+	if (CBWnd::Create(L"D2DTutWindowClassAnim", _width, _height, nCmdShow, IDR_MENU2) == false)
 		return false;
 
 	InvalidateRgn(m_hWnd, NULL, true);
@@ -32,6 +33,15 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_PIVOT:
+			break;
+		case ID_ANIMATION:
+
+			break;
+		}
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 
@@ -79,7 +89,7 @@ void CAnimWnd::Render()
 	for (int i = 0; i < CBitmap::GetInst()->GetVecClipSize(); i++)
 	{
 		CSprite* sprite = CBitmap::GetInst()->GetVecClip(i);
-		CBitmap::GetInst()->RenderSprite(m_pRenderTarget, i, pos);
+		CBitmap::GetInst()->RenderClip(m_pRenderTarget, i, pos);
 		pos += sprite->GetSize().right - sprite->GetSize().left;
 	}
 
