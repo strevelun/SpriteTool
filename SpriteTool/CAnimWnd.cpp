@@ -75,6 +75,8 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			float pivotX = (xpos - rect.left) / (float)(rect.right - rect.left);
 			float pivotY = (ypos - rect.top) / (float)(rect.bottom - rect.top);
+			if (pivotY > 1.0f || pivotX > 1.0f)
+				break;
 			sprite->SetPivotX(pivotX);
 			sprite->SetPivotY(pivotY);
 		}

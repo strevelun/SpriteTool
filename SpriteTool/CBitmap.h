@@ -46,7 +46,7 @@ public:
 	void SetBitmap(ID2D1Bitmap* _bitmap) { m_bitmap = _bitmap; }
 	void Render(ID2D1HwndRenderTarget* _pRenderTarget, float _x = 0.f, float _y = 0.f);
 	void RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f);
-	void RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f);
+	void RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f, bool _pivot = false);
 
 	void AddSprite(CSprite* _sprite);
 	

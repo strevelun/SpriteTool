@@ -1,5 +1,6 @@
 #include "CAnimViewWnd.h"
 #include "CBitmap.h"
+#include "CSprite.h"
 
 CAnimViewWnd::CAnimViewWnd(HINSTANCE _hInstance)
 {
@@ -64,9 +65,9 @@ void CAnimViewWnd::Render()
 	int size = CBitmap::GetInst()->GetVecClipSize();
 	if (size <= 0) return;
 
-
 	m_curIdx = (m_curIdx + 1) % size;
-	CBitmap::GetInst()->RenderClip(m_pRenderTarget, m_curIdx);
-	
+
+	CBitmap::GetInst()->RenderClip(m_pRenderTarget, m_curIdx, 200, 200, true);
+
 	m_pRenderTarget->EndDraw();
 }

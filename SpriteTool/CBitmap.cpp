@@ -139,15 +139,27 @@ void CBitmap::RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int i
 		D2D1::RectF(m_vecSprite[idx]->GetSize().left, m_vecSprite[idx]->GetSize().top, m_vecSprite[idx]->GetSize().right, m_vecSprite[idx]->GetSize().bottom));
 }
 
-void CBitmap::RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x, float _y)
+void CBitmap::RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x, float _y, bool _pivot)
 {
 	if (!m_bitmap) return;
 	if (idx >= m_vecClip.size()) return;
 
-	_pRenderTarget->DrawBitmap(m_bitmap, D2D1::RectF(_x, _y, m_vecClip[idx]->GetSize().right - m_vecClip[idx]->GetSize().left + _x, m_vecClip[idx]->GetSize().bottom - m_vecClip[idx]->GetSize().top + _y), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-		D2D1::RectF(m_vecClip[idx]->GetSize().left, m_vecClip[idx]->GetSize().top, m_vecClip[idx]->GetSize().right, m_vecClip[idx]->GetSize().bottom));
+	CSprite* sprite = m_vecClip[idx];
 
-
+	if(!_pivot)
+		_pRenderTarget->DrawBitmap(m_bitmap, D2D1::RectF(_x, _y, 
+			sprite->GetSize().right - sprite->GetSize().left + _x, 
+			sprite->GetSize().bottom - sprite->GetSize().top + _y),
+			1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+			D2D1::RectF(sprite->GetSize().left, sprite->GetSize().top, sprite->GetSize().right, sprite->GetSize().bottom));
+	else
+		_pRenderTarget->DrawBitmap(m_bitmap, D2D1::RectF(
+			_x - sprite->GetPivotX() * (sprite->GetSize().right - sprite->GetSize().left),
+			_y - sprite->GetPivotY() * (sprite->GetSize().bottom - sprite->GetSize().top),
+			sprite->GetSize().right - sprite->GetSize().left + _x - sprite->GetPivotX() * (sprite->GetSize().right - sprite->GetSize().left),
+			sprite->GetSize().bottom - sprite->GetSize().top + _y - sprite->GetPivotY() * (sprite->GetSize().bottom - sprite->GetSize().top)),
+			1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+			D2D1::RectF(sprite->GetSize().left, sprite->GetSize().top, sprite->GetSize().right, sprite->GetSize().bottom));
 }
 
 void CBitmap::AddSprite(CSprite* _sprite)
