@@ -38,6 +38,7 @@ int CApp::Run()
 		}
 	}
 
+	CBitmap::GetInst()->DestroyInst();
 	CCore::GetInst()->CleanupDevice();
 	CCore::DeleteInst();
 

@@ -1,4 +1,5 @@
 #include "CSprite.h"
+#include "CBitmap.h"
 
 CSprite::CSprite()
 {

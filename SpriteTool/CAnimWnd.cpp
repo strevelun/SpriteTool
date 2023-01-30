@@ -6,6 +6,9 @@
 #include "CSprite.h"
 #include "resource.h"
 #include "CAnimViewWnd.h"
+#include "CAnimationClip.h"
+#include "CCamera.h"
+
 #include <windowsx.h>
 
 CAnimWnd::CAnimWnd(HINSTANCE hInstance)
@@ -16,6 +19,7 @@ CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 CAnimWnd::~CAnimWnd()
 {
 	if (m_pRenderTarget) m_pRenderTarget->Release();
+	delete m_camera;
 }
 
 bool CAnimWnd::Create(int _width, int _height, int nCmdShow)
@@ -24,6 +28,7 @@ bool CAnimWnd::Create(int _width, int _height, int nCmdShow)
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, IDR_MENU2) == false)
 		return false;
 
+	m_camera = new CCamera();
 	InvalidateRgn(m_hWnd, NULL, true);
 
 	return true;
@@ -42,10 +47,25 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case ID_PIVOT:
 			break;
 		case ID_ANIMATION:
-			m_viewWnd = new CAnimViewWnd(NULL);
+			if(m_viewWnd == nullptr)
+				m_viewWnd = new CAnimViewWnd(NULL);
 			m_viewWnd->Create(500, 500, SW_SHOWNORMAL);
 			break;
 		}
+
+	case WM_KEYDOWN:
+		switch (wParam) {
+		case VK_LEFT:
+			//if (m_camera->GetXPos() < CBitmap::GetInst()->GetBitmapSize().width)
+			m_camera->UpdateXPos(5);
+			break;
+		case VK_RIGHT:
+			//if (m_camera->GetXPos() > 0)
+			m_camera->UpdateXPos(-5);
+			break;
+		}
+		InvalidateRect(hWnd, NULL, false);
+
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 
@@ -56,21 +76,17 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOUSEMOVE:
 	{
-		InvalidateRgn(hWnd, NULL, false);
-
-		if (m_curClickedSprite)
-		{
-
-		}
 		break;
 	}
 	case WM_LBUTTONDOWN:
 	{
 		int xpos = GET_X_LPARAM(lParam);
 		int ypos = GET_Y_LPARAM(lParam);
-
-		D2D1_RECT_F rect;
-		CSprite* sprite = CBitmap::GetInst()->GetClipInPos(xpos, ypos, rect);
+		xpos -= m_camera->GetXPos();
+		D2D1_RECT_F rect = {0};
+		CSprite* sprite = CAnimationClip::GetInst()->GetClipInPos(xpos, ypos, rect, m_camera);
+		//rect.left += m_camera->GetXPos();
+		//rect.right += m_camera->GetXPos();
 		if (sprite != nullptr)
 		{
 			float pivotX = (xpos - rect.left) / (float)(rect.right - rect.left);
@@ -80,12 +96,10 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			sprite->SetPivotX(pivotX);
 			sprite->SetPivotY(pivotY);
 		}
+		InvalidateRect(hWnd, NULL, false);
 		
-
 		break;
 	}
-	case WM_RBUTTONDOWN:
-		break;
 
 	case WM_MOUSEWHEEL:
 		break;
@@ -113,16 +127,16 @@ void CAnimWnd::Render()
 
 	int pos = 0;
 
-	for (int i = 0; i < CBitmap::GetInst()->GetVecClipSize(); i++)
+	for (int i = 0; i < CAnimationClip::GetInst()->GetVecClipSize(); i++)
 	{
-		CSprite* clip = CBitmap::GetInst()->GetVecClip(i);
-		CBitmap::GetInst()->RenderClip(m_pRenderTarget, i, pos);
+		CSprite* clip = CAnimationClip::GetInst()->GetVecClip(i);
+		CAnimationClip::GetInst()->RenderClip(m_pRenderTarget, i, pos + m_camera->GetXPos());
 		D2D1_RECT_F rect = clip->GetSize();
-		rect.left = pos;
+		rect.left = pos + m_camera->GetXPos();
 		rect.bottom -= rect.top;
 		rect.top = 0;
 		pos += clip->GetSize().right - clip->GetSize().left;
-		rect.right = pos;
+		rect.right = pos + m_camera->GetXPos();
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 
 		D2D1_RECT_F dot;

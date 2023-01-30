@@ -6,6 +6,7 @@
 #include "CBWnd.h"
 #include "CBitmap.h"
 #include "CMouse.h"
+#include "CCamera.h"
 
 enum class MouseMode
 {
@@ -18,8 +19,18 @@ enum class MouseMode
 class CSpriteWnd
 	: public CBWnd
 {
+private:
 	CMouse* m_pMouse = nullptr;
 	MouseMode m_mode = MouseMode::AutoSlice;
+	CCamera* m_camera = nullptr;
+
+	DWORD m_keyColor = 0;
+
+private:
+	void Find(std::vector<std::vector<bool>>& _visited, int _curX, int _curY);
+	void AutoSliceSprite();
+	void DragSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
+	void RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
 
 
 public:

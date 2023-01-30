@@ -2,13 +2,14 @@
 
 #include <d2d1.h>
 
+class CBitmap;
+
 class CSprite
 {
 private:
 	float m_pivotX = 0.5f, m_pivotY = 0.5f;
 
 	D2D1_RECT_F m_size = {};
-	ID2D1Bitmap* m_bitmap = nullptr;
 
 public:
 	CSprite();

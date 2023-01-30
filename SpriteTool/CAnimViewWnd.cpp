@@ -1,6 +1,7 @@
 #include "CAnimViewWnd.h"
 #include "CBitmap.h"
 #include "CSprite.h"
+#include "CAnimationClip.h"
 
 CAnimViewWnd::CAnimViewWnd(HINSTANCE _hInstance)
 {
@@ -45,7 +46,9 @@ LRESULT CAnimViewWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 	case WM_DESTROY:
 		//PostQuitMessage(0);
-		KillTimer(hWnd, 1);
+		//KillTimer(hWnd, 1);
+		ShowWindow(m_hWnd, SW_HIDE);
+
 		break;
 
 	default:
@@ -62,12 +65,12 @@ void CAnimViewWnd::Render()
 	m_pRenderTarget->BeginDraw();
 	m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-	int size = CBitmap::GetInst()->GetVecClipSize();
+	int size = CAnimationClip::GetInst()->GetVecClipSize();
 	if (size <= 0) return;
 
 	m_curIdx = (m_curIdx + 1) % size;
 
-	CBitmap::GetInst()->RenderClip(m_pRenderTarget, m_curIdx, 200, 200, true);
+	CAnimationClip::GetInst()->RenderClip(m_pRenderTarget, m_curIdx, 200, 200, true);
 
 	m_pRenderTarget->EndDraw();
 }

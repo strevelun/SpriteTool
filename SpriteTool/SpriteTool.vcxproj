@@ -127,11 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CAnimationClip.cpp" />
     <ClCompile Include="CAnimViewWnd.cpp" />
     <ClCompile Include="CAnimWnd.cpp" />
     <ClCompile Include="CApp.cpp" />
     <ClCompile Include="CBitmap.cpp" />
     <ClCompile Include="CBWnd.cpp" />
+    <ClCompile Include="CCamera.cpp" />
     <ClCompile Include="CCore.cpp" />
     <ClCompile Include="CMouse.cpp" />
     <ClCompile Include="CSprite.cpp" />
@@ -139,11 +141,13 @@
     <ClCompile Include="SpriteTool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CAnimationClip.h" />
     <ClInclude Include="CAnimViewWnd.h" />
     <ClInclude Include="CAnimWnd.h" />
     <ClInclude Include="CApp.h" />
     <ClInclude Include="CBitmap.h" />
     <ClInclude Include="CBWnd.h" />
+    <ClInclude Include="CCamera.h" />
     <ClInclude Include="CCore.h" />
     <ClInclude Include="CMouse.h" />
     <ClInclude Include="CSprite.h" />

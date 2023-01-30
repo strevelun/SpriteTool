@@ -7,12 +7,13 @@
 class CBitmap;
 class CAnimViewWnd;
 class CSprite;
+class CCamera;
 
 class CAnimWnd : public CBWnd
 {
 	CBitmap* m_pImage = nullptr;
 	CAnimViewWnd* m_viewWnd = nullptr;
-	CSprite* m_curClickedSprite = nullptr;
+	CCamera* m_camera = nullptr;
 
 public:
 	CAnimWnd(HINSTANCE _hInstance);

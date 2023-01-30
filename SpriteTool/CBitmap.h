@@ -4,6 +4,7 @@
 #include <string>
 
 class CSprite;
+class CCamera;
 
 class CBitmap
 {
@@ -13,14 +14,10 @@ private:
 	DWORD* m_bitmapPixel = nullptr;
 	D2D1_SIZE_F m_size;
 
-	std::vector<CSprite*> m_vecSprite;
-	std::vector<CSprite*> m_vecClip;
 
 private:
 	CBitmap();
 	~CBitmap();
-
-	void Find(std::vector<std::vector<bool>>& _visited, int _curX, int _curY);
 
 public:
 	static CBitmap* GetInst() 
@@ -41,35 +38,13 @@ public:
 
 	void OpenFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget);
 	ID2D1Bitmap* GetBitmap() const { return m_bitmap; }
+	D2D1_SIZE_F GetBitmapSize() const { return m_size; }
+	DWORD* GetBitmapPixel() const { return m_bitmapPixel; }
+
 	void SetBitmap(ID2D1Bitmap* _bitmap) { m_bitmap = _bitmap; }
-	void Render(ID2D1HwndRenderTarget* _pRenderTarget, float _x = 0.f, float _y = 0.f);
-	void RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f);
-	void RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f, bool _pivot = false);
-
-	void AddSprite(CSprite* _sprite);
+	void Render(ID2D1HwndRenderTarget* _pRenderTarget, CCamera* _camera, float _x = 0.f, float _y = 0.f);
 	
-	CSprite* GetVecSprite(unsigned int idx) const 
-	{ 
-		if (idx >= m_vecSprite.size()) return nullptr;
-		return m_vecSprite[idx]; 
-	}
-	CSprite* GetVecClip(unsigned int idx) const
-	{
-		if (idx >= m_vecClip.size()) return nullptr;
-		return m_vecClip[idx];
-	}
-
-	unsigned int GetVecSpriteSize() const { return m_vecSprite.size(); }
-	unsigned int GetVecClipSize() const { return m_vecClip.size(); }
-	void ClearVecSpriteAndClip();
-
 	std::wstring GetPixelColorString(unsigned int _xpos, unsigned int _ypos);
-
-	void AutoSliceSprite();
-	void DragSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
-	void RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
-	void AddClip(int _xpos, int _ypos);
-
-	CSprite* GetClipInPos(int _xpos, int _ypos, D2D1_RECT_F& _r);
+	void KeyColor(DWORD _keyColor);
 };
 

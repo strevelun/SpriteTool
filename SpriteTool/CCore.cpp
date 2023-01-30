@@ -52,6 +52,7 @@ DWORD* CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRe
 	IWICBitmap* pIBitmap = nullptr;
 	IWICBitmapLock* pILock = nullptr;
 
+	// CreateBitmapFromMemory 
 	hr = m_pWICFactory->CreateBitmapFromSource(pFrame, WICBitmapCacheOnDemand, &pIBitmap);
 	UINT width, height;
 	pIBitmap->GetSize(&width, &height);
