@@ -154,7 +154,6 @@ void CSpriteWnd::DragSprite(int _startPosX, int _startPosY, int _endPosX, int _e
 	{
 		for (int j = _startPosX + 1; j < _endPosX - 1; j++)
 		{
-			//if (bitmapPixel[i * (int)size.width + j] != 0x00000000)
 			if (bitmapPixel[i * (int)size.width + j] & 0xff000000)
 			{
 				if (minX > j)
@@ -210,7 +209,8 @@ void CSpriteWnd::RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int 
 		{
 			for (int j = 0; j < CAnimationClip::GetInst()->GetVecClipSize(); j++)
 			{
-				D2D1_RECT_F r2 = CAnimationClip::GetInst()->GetVecClip(j)->GetSize();
+				CSprite* sprite2 = CAnimationClip::GetInst()->GetVecClip(j);
+				D2D1_RECT_F r2 = sprite2->GetSize();
 				if (r.left == r2.left && r.top == r2.top && r.right == r2.right && r.bottom == r2.bottom)
 				{
 					CAnimationClip::GetInst()->EraseClip(j);
@@ -220,6 +220,7 @@ void CSpriteWnd::RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int 
 
 			delete sprite;
 			CAnimationClip::GetInst()->EraseClip(i);
+			CAnimationClip::GetInst()->EraseSprite(i);
 			i--; // 벡터 원소 지우면서 크기 변화때문에 스킵하는 원소 발생 방지
 		}
 	}
@@ -288,7 +289,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case ID_ALL_BOXES:
 			CAnimationClip::GetInst()->ClearVecSpriteAndClip();
 			InvalidateRgn(m_hWnd, NULL, false);
-
+			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 			break;
 		}
 		break;
@@ -358,8 +359,11 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DragSprite(m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
 				m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
 		else if (m_mode == MouseMode::RemoveSprite)
+		{
 			RemoveSprite(m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
 				m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
+		}
 		else if (m_mode == MouseMode::AddClip)
 		{
 			CAnimationClip::GetInst()->AddClip(m_camera, m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
