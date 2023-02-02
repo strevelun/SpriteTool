@@ -25,9 +25,10 @@ private:
 	CCamera* m_camera = nullptr;
 
 	DWORD m_keyColor = 0;
+	int m_count = 0;
 
 private:
-	void Find(std::vector<std::vector<bool>>& _visited, int _curX, int _curY);
+	void Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY, int _curSprite);
 	void AutoSliceSprite();
 	void DragSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
 	void RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);

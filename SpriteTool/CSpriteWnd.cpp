@@ -7,23 +7,23 @@
 #include "CSprite.h"
 #include "CAnimationClip.h"
 
-#include <stack>
 #include <windowsx.h>
 #include <string>
-#include <queue>
+#include <vector>
+#include <windows.h>
 
 #pragma comment( lib, "d2d1.lib " ) 
+#pragma comment(lib, "winmm.lib") 
 
-void CSpriteWnd::Find(std::vector<std::vector<bool>>& _visited, int _curX, int _curY)
+void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY, int _curSprite)
 {
 	int curX = _curX, curY = _curY;
 	int searchX, searchY;
-	//int dir[8][2] = { {0,-1}, {1,-1}, {1,0}, {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1} }; // {x, y}
 	int dir[4][2] = { {0,-1}, {1,0}, {0,1},{-1,0} };
-	std::queue<std::pair<int, int>*> q;
+	std::vector<std::pair<int, int>> v;
 
-	q.push(new std::pair<int, int>(curY, curX));
-	_visited[curY][curX] = true;
+	v.push_back(std::pair<int, int>(curY, curX));
+	_visited[curY][curX] = _curSprite;
 
 	int minX = 999999, minY = 999999;
 	int maxX = 0, maxY = 0;
@@ -32,16 +32,13 @@ void CSpriteWnd::Find(std::vector<std::vector<bool>>& _visited, int _curX, int _
 	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
 	DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
 
-	while (!q.empty())
+	while (!v.empty())
 	{
-		std::pair<int, int>* p = q.front();
-		curY = p->first;
-		curX = p->second;
-		q.pop();
-		delete p;
-
-
-
+		std::pair<int, int> p = v.back();
+		curY = p.first;
+		curX = p.second;
+		v.pop_back();
+		
 		for (int i = 0; i < 4; i++)
 		{
 			int nextX = curX + dir[i][0];
@@ -50,13 +47,13 @@ void CSpriteWnd::Find(std::vector<std::vector<bool>>& _visited, int _curX, int _
 			if (nextX < 0 || nextX >= size.width || nextY < 0 || nextY >= size.height)
 				continue;
 
-			if (!_visited[nextY][nextX] && bitmapPixel[nextY * (int)size.width + nextX] != 0xffffffff)
+			if (_visited[nextY][nextX]) continue;
+
+			if (bitmapPixel[nextY * (int)size.width + nextX] & 0xff000000)  // 0xffff00000
 			{
-				q.push(new std::pair<int, int>(nextY, nextX));
-				_visited[nextY][nextX] = true;
+				_visited[nextY][nextX] = _curSprite;
 
-
-
+				v.push_back({nextY, nextX});
 				if (minX > nextX)
 					minX = nextX;
 				if (maxX < nextX)
@@ -79,6 +76,7 @@ void CSpriteWnd::Find(std::vector<std::vector<bool>>& _visited, int _curX, int _
 
 	CSprite* sprite = new CSprite(rect);
 	CAnimationClip::GetInst()->AddSprite(sprite);
+	m_count++;
 }
 
 void CSpriteWnd::AutoSliceSprite()
@@ -90,21 +88,40 @@ void CSpriteWnd::AutoSliceSprite()
 	DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
 	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
 
-	std::vector<std::vector<bool>> visited(size.height, std::vector<bool>(size.width, false));
+	std::vector<std::vector<int>> visited(size.height, std::vector<int>(size.width, 0));
+	int curSprite = 1;
 
-	// if(m_bitmapPixel[i * (int)m_size.width + j] & 0xff000000)
+	DWORD first = timeGetTime();
 
 	for (int i = 0; i < size.height; i++)
 	{
 		for (int j = 0; j < size.width; j++)
 		{
-			if (!visited[i][j] && bitmapPixel[i * (int)size.width + j] != 0xffffffff)  // 0xffff00000
+			CSprite* sprite = CAnimationClip::GetInst()->GetVecSprite(visited[i][j] - 1);
+			if (sprite)
 			{
-				Find(visited, j, i);
+				D2D1_RECT_F rect = sprite->GetSize();
+				int width = rect.right - rect.left;
+				if (rect.left <= j && j <= rect.right && rect.top <= i && i <= rect.bottom)
+					j += width;
 
+				if (j >= size.width)
+					j = size.width - 1;
+			}
+			if (visited[i][j]) continue;
+
+			if ( bitmapPixel[i * (int)size.width + j] & 0xff000000)  // 0xffff00000
+			{
+				Find(visited, j, i, curSprite++); 
 			}
 		}
 	}
+	DWORD second = timeGetTime();
+#ifdef _DEBUG
+	char str[100];
+	sprintf_s(str, "%d - %d\n", m_count, second - first);
+	OutputDebugStringA(str);
+#endif
 }
 
 void CSpriteWnd::DragSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY)
@@ -137,7 +154,8 @@ void CSpriteWnd::DragSprite(int _startPosX, int _startPosY, int _endPosX, int _e
 	{
 		for (int j = _startPosX + 1; j < _endPosX - 1; j++)
 		{
-			if (bitmapPixel[i * (int)size.width + j] != 0xffffffff)
+			//if (bitmapPixel[i * (int)size.width + j] != 0x00000000)
+			if (bitmapPixel[i * (int)size.width + j] & 0xff000000)
 			{
 				if (minX > j)
 					minX = j;
@@ -223,7 +241,7 @@ CSpriteWnd::~CSpriteWnd()
 bool CSpriteWnd::Create(int _width, int _height, int nCmdShow)
 {
 	if (CBWnd::Create(L"D2DTutWindowClassSprite", _width, _height, nCmdShow,
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, IDR_MENU1) == false)
+		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, IDR_MENU1) == false)
 		return false;
 
 	m_pMouse = new CMouse();
@@ -322,7 +340,10 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		m_pMouse->UpdateMouseStartPos(xpos, ypos);
 		m_pMouse->UpdateClickState(true);
 
-		m_keyColor = CBitmap::GetInst()->GetBitmapPixel()[ypos * (int)CBitmap::GetInst()->GetBitmapSize().width + xpos];
+		DWORD* pixel = CBitmap::GetInst()->GetBitmapPixel();
+		if (!pixel)
+			break;
+		m_keyColor = pixel[ypos * (int)CBitmap::GetInst()->GetBitmapSize().width + xpos];
 
 		break;
 	}
