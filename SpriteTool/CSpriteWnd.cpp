@@ -313,6 +313,16 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
+	case WM_SIZE:
+	{
+		int w = LOWORD(lParam);
+		int h = HIWORD(lParam);
+		D2D1_SIZE_U size;
+		size.width = w;
+		size.height = h;
+		m_pRenderTarget->Resize(size);
+		break;
+	}
 	case WM_KEYDOWN:
 		switch (wParam) {
 		case VK_LEFT:

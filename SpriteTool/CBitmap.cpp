@@ -60,7 +60,7 @@ void CBitmap::OpenFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 
 	ID2D1Bitmap* bitmap;
 	m_bitmapPixel = CCore::GetInst()->LoadBitmapFromFile(fileName, _pRenderTarget, &bitmap, &m_size);
-	//delete m_bitmap;
+	if( m_bitmap ) m_bitmap->Release();
 	m_bitmap = bitmap;
 
 	InvalidateRgn(_hWnd, NULL, true);
