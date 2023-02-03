@@ -15,15 +15,16 @@
 #pragma comment( lib, "d2d1.lib " ) 
 #pragma comment(lib, "winmm.lib") 
 
-void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY, int _curSprite)
+void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY)
 {
 	int curX = _curX, curY = _curY;
 	int searchX, searchY;
+	//int dir[8][2] = { {0,-1}, {1,-1}, {1,0}, {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1} }; // {x, y}
 	int dir[4][2] = { {0,-1}, {1,0}, {0,1},{-1,0} };
 	std::vector<std::pair<int, int>> v;
 
 	v.push_back(std::pair<int, int>(curY, curX));
-	_visited[curY][curX] = _curSprite;
+	_visited[curY][curX] = 1;
 
 	int minX = 999999, minY = 999999;
 	int maxX = 0, maxY = 0;
@@ -51,7 +52,7 @@ void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _c
 
 			if (bitmapPixel[nextY * (int)size.width + nextX] & 0xff000000)  // 0xffff00000
 			{
-				_visited[nextY][nextX] = _curSprite;
+				_visited[nextY][nextX] = 1;
 
 				v.push_back({nextY, nextX});
 				if (minX > nextX)
@@ -89,7 +90,7 @@ void CSpriteWnd::AutoSliceSprite()
 	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
 
 	std::vector<std::vector<int>> visited(size.height, std::vector<int>(size.width, 0));
-	int curSprite = 1;
+	//int curSprite = 1;
 
 	DWORD first = timeGetTime();
 
@@ -97,40 +98,47 @@ void CSpriteWnd::AutoSliceSprite()
 	{
 		for (int j = 0; j < size.width; j++)
 		{
+			/*
 			CSprite* sprite = CAnimationClip::GetInst()->GetVecSprite(visited[i][j] - 1);
 			if (sprite)
 			{
 				D2D1_RECT_F rect = sprite->GetSize();
 				int width = rect.right - rect.left;
 				if (rect.left <= j && j <= rect.right && rect.top <= i && i <= rect.bottom)
-					j += width;
+					j += width - j + rect.left+1;
 
 				if (j >= size.width)
 					j = size.width - 1;
 			}
+			*/
 			if (visited[i][j]) continue;
 
 			if ( bitmapPixel[i * (int)size.width + j] & 0xff000000)  // 0xffff00000
 			{
-				Find(visited, j, i, curSprite++); 
+				Find(visited, j, i); 
 			}
 		}
 	}
 	DWORD second = timeGetTime();
 #ifdef _DEBUG
 	char str[100];
-	sprintf_s(str, "%d - %d\n", m_count, second - first);
+	sprintf_s(str, "%d개 - %d밀리초\n", m_count, second - first);
 	OutputDebugStringA(str);
 #endif
 }
 
-void CSpriteWnd::DragSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY)
+void CSpriteWnd::DragSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY)
 {
 	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
 	DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
 
-	if (_endPosX >= size.width || _endPosY >= size.height) return;
-	if (_startPosX >= size.width || _startPosY >= size.height) return;
+	_startPosX -= _camera->GetXPos();
+	_endPosX -= _camera->GetXPos();
+	_startPosY -= _camera->GetYPos();
+	_endPosY -= _camera->GetYPos();
+
+	if ((_startPosX < 0 || _startPosY < 0) && (_endPosX < 0 || _endPosY < 0)) return;
+	if ((_startPosX >= size.width || _startPosY >= size.height) && (_endPosX >= size.width || _endPosY >= size.height)) return;
 
 	if (_startPosX > _endPosX)
 	{
@@ -145,6 +153,9 @@ void CSpriteWnd::DragSprite(int _startPosX, int _startPosY, int _endPosX, int _e
 		_startPosY = _endPosY;
 		_endPosY = t;
 	}
+
+	if (_endPosY >= size.height) _endPosY = size.height - 1;
+	if (_endPosX >= size.width) _endPosX = size.width - 1;
 
 	D2D1_RECT_F rect = { 0 };
 	int minX = 999999, minY = 999999;
@@ -180,9 +191,14 @@ void CSpriteWnd::DragSprite(int _startPosX, int _startPosY, int _endPosX, int _e
 	CAnimationClip::GetInst()->AddSprite(sprite);
 }
 
-void CSpriteWnd::RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY)
+void CSpriteWnd::RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY)
 {
 	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
+
+	_startPosX -= _camera->GetXPos();
+	_endPosX -= _camera->GetXPos();
+	_startPosY -= _camera->GetYPos();
+	_endPosY -= _camera->GetYPos();
 
 	if (_endPosX >= size.width || _endPosY >= size.height) return;
 	if (_startPosX >= size.width || _startPosY >= size.height) return;
@@ -267,7 +283,9 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case ID_LOAD_IMAGE:
+			CAnimationClip::GetInst()->ClearVecSpriteAndClip();
 			CBitmap::GetInst()->OpenFile(hWnd, m_pRenderTarget);
+			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 			break;
 		case ID_AUTO_SLICE:
 			m_mode = MouseMode::AutoSlice;
@@ -299,18 +317,18 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam) {
 		case VK_LEFT:
 			if (m_camera->GetXPos() < CBitmap::GetInst()->GetBitmapSize().width)
-				m_camera->UpdateXPos(5);
+				m_camera->UpdateXPos(15);
 			break;
 		case VK_RIGHT:
 			//if (m_camera->GetXPos() > 0)
-				m_camera->UpdateXPos(-5);
+				m_camera->UpdateXPos(-15);
 			break;
 		case VK_UP:
-				m_camera->UpdateYPos(5);
+				m_camera->UpdateYPos(15);
 			break;
 		case VK_DOWN:
 			//if(m_camera->GetYPos() > 0)
-				m_camera->UpdateYPos(-5);
+				m_camera->UpdateYPos(-15);
 			break;
 		}
 		InvalidateRect(hWnd, NULL, false);
@@ -356,11 +374,13 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		m_pMouse->UpdateClickState(false);
 
 		if (m_mode == MouseMode::DragSlice)
-			DragSprite(m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
+		{
+			DragSprite(m_camera, m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
 				m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+		}
 		else if (m_mode == MouseMode::RemoveSprite)
 		{
-			RemoveSprite(m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
+			RemoveSprite(m_camera, m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
 				m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 		}

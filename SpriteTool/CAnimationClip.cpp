@@ -71,15 +71,17 @@ void CAnimationClip::AddClip(CCamera* _camera, int _xpos, int _ypos)
 		}
 	}
 }
-
-CSprite* CAnimationClip::GetVecSprite(unsigned int idx) const
+/*
+CSprite* CAnimationClip::GetVecSprite(int idx) const
 {
+	if (idx < 0) return nullptr;
 	if (idx >= m_vecSprite.size()) return nullptr;
 	return m_vecSprite[idx];
 }
-
-CSprite* CAnimationClip::GetVecClip(unsigned int idx) const
+*/
+CSprite* CAnimationClip::GetVecClip(int idx) const
 {
+	if (idx < 0) return nullptr;
 	if (idx >= m_vecClip.size()) return nullptr;
 	return m_vecClip[idx];
 }

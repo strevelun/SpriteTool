@@ -57,11 +57,11 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam) {
 		case VK_LEFT:
 			//if (m_camera->GetXPos() < CBitmap::GetInst()->GetBitmapSize().width)
-			m_camera->UpdateXPos(5);
+			m_camera->UpdateXPos(15);
 			break;
 		case VK_RIGHT:
 			//if (m_camera->GetXPos() > 0)
-			m_camera->UpdateXPos(-5);
+			m_camera->UpdateXPos(-15);
 			break;
 		}
 		InvalidateRect(hWnd, NULL, false);

@@ -28,10 +28,10 @@ private:
 	int m_count = 0;
 
 private:
-	void Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY, int _curSprite);
+	void Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY);
 	void AutoSliceSprite();
-	void DragSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
-	void RemoveSprite(int _startPosX, int _startPosY, int _endPosX, int _endPosY);
+	void DragSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY);
+	void RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY);
 
 
 public:

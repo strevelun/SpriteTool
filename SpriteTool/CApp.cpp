@@ -17,7 +17,7 @@ HRESULT CApp::Init(HINSTANCE hInstance, int nCmdShow)
 		return E_FAIL;
 
 	m_spriteWnd = new CSpriteWnd(hInstance);
-	if (m_spriteWnd->Create(1960, 1280, nCmdShow) == false)
+	if (m_spriteWnd->Create(1280, 720, nCmdShow) == false)
 		return E_FAIL;
 
 

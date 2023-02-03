@@ -37,8 +37,13 @@ public:
 
 	unsigned int GetVecSpriteSize() const { return m_vecSprite.size(); }
 	unsigned int GetVecClipSize() const { return m_vecClip.size(); }
-	CSprite* GetVecSprite(unsigned int idx) const;
-	CSprite* GetVecClip(unsigned int idx) const;
+	CSprite* GetVecSprite(int idx) const
+	{
+		if (idx < 0) return nullptr;
+		if (idx >= m_vecSprite.size()) return nullptr;
+		return m_vecSprite[idx];
+	}
+	CSprite* GetVecClip(int idx) const;
 	CSprite* GetClipInPos(int _xpos, int _ypos, D2D1_RECT_F& _r, CCamera* _camera);
 
 	void AddSprite(CSprite* _sprite);
