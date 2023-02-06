@@ -46,6 +46,17 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case ID_PIVOT:
 			break;
+
+		case ID_SAVE_CLIPS:
+		{
+			CBitmap::GetInst()->SaveClip(hWnd);
+			break;
+		}
+
+		case ID_LOAD_CLIP:
+			CBitmap::GetInst()->LoadClip(hWnd, m_pRenderTarget);
+			break;
+
 		case ID_ANIMATION:
 			if(m_viewWnd == nullptr)
 				m_viewWnd = new CAnimViewWnd(NULL);
@@ -87,15 +98,15 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		CSprite* sprite = CAnimationClip::GetInst()->GetClipInPos(xpos, ypos, rect, m_camera);
 		//rect.left += m_camera->GetXPos();
 		//rect.right += m_camera->GetXPos();
-		if (sprite != nullptr)
-		{
+		//if (sprite != {})
+		
 			float pivotX = (xpos - rect.left) / (float)(rect.right - rect.left);
 			float pivotY = (ypos - rect.top) / (float)(rect.bottom - rect.top);
 			if (pivotY > 1.0f || pivotX > 1.0f)
 				break;
 			sprite->SetPivotX(pivotX);
 			sprite->SetPivotY(pivotY);
-		}
+		
 		InvalidateRect(hWnd, NULL, false);
 		
 		break;

@@ -9,6 +9,7 @@
 #include <Windows.h>
 #include <stack>
 #include <unordered_map>
+#include <string>
 
 CBitmap* CBitmap::m_inst = nullptr;
 
@@ -20,7 +21,7 @@ CBitmap::~CBitmap()
 {
 }
 
-void CBitmap::OpenFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
+void CBitmap::OpenImageFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 {
 
 	OPENFILENAME OFN;
@@ -66,6 +67,71 @@ void CBitmap::OpenFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 	InvalidateRgn(_hWnd, NULL, true);
 }
 
+void CBitmap::SaveImageFile(HWND _hWnd)
+{
+	
+	if (!m_bitmap)
+		return;
+
+	OPENFILENAME ofn;
+	TCHAR lpstrFile[100] = L"";
+	static TCHAR filter[] = L"png\0*.png";
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = _hWnd;
+	ofn.lpstrFilter = filter;
+	ofn.lpstrFile = lpstrFile;
+	ofn.nMaxFile = 100;
+	ofn.lpstrInitialDir = L".";
+
+	if (GetSaveFileName(&ofn) == 0) return;
+
+	std::wstring strFilePath = lpstrFile;
+	strFilePath.append(L".");
+	strFilePath.append(ofn.lpstrFilter);
+
+	FILE* pFile = nullptr;
+
+	errno_t errNum = _wfopen_s(&pFile, strFilePath.c_str(), L"wb");
+
+	if (pFile == nullptr || errNum != 0)
+		return;
+
+	BITMAPFILEHEADER fileHeader;
+	BITMAPINFOHEADER infoHeader;
+
+	fileHeader.bfType = 0x4d42;
+	fileHeader.bfSize = 4 * m_size.width * m_size.height + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+	fileHeader.bfReserved1 = 0;
+	fileHeader.bfReserved2 = 0;
+	fileHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+	infoHeader.biSize = sizeof(infoHeader);
+	infoHeader.biWidth = m_size.width;
+	infoHeader.biHeight = m_size.height;
+	infoHeader.biPlanes = 1;
+	infoHeader.biBitCount = 32;
+	infoHeader.biCompression = BI_PNG;
+	infoHeader.biSizeImage = 0;
+	infoHeader.biXPelsPerMeter = 0;
+	infoHeader.biYPelsPerMeter = 0;
+	infoHeader.biClrUsed = 0;
+	infoHeader.biClrImportant = 0;
+
+	DWORD dwTmp;
+
+	int size1 = sizeof(fileHeader);
+
+	fwrite((char*)&fileHeader, sizeof(fileHeader), 1, pFile);
+	fwrite((char*)&infoHeader, sizeof(infoHeader), 1, pFile);
+	fwrite((DWORD*)&m_bitmapPixel, sizeof(DWORD) * m_size.width * m_size.height, 1, pFile);
+
+	fclose(pFile);
+	
+
+	//hr = m_pWICFactory->CreateStream(&pStream);
+}
+
 void CBitmap::Render(ID2D1HwndRenderTarget* _pRenderTarget, CCamera* _camera, float _x, float _y)
 {
 	if (!m_bitmap) return;
@@ -101,4 +167,134 @@ void CBitmap::KeyColor(DWORD _keyColor)
 			}
 		}
 	}
+}
+
+void CBitmap::SaveClip(HWND _hWnd)
+{
+	if (!m_bitmap)	return;
+	if (CAnimationClip::GetInst()->GetVecClipSize() <= 0) return;
+
+	OPENFILENAME ofn;
+	TCHAR lpstrFile[100] = L"";
+	static TCHAR filter[] = L"spr\0*.spr";
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = _hWnd;
+	ofn.lpstrFilter = filter;
+	ofn.lpstrFile = lpstrFile;
+	ofn.nMaxFile = 100;
+	ofn.lpstrInitialDir = L".";
+
+	if (GetSaveFileName(&ofn) == 0) return;
+
+	std::wstring strFilePath = lpstrFile;
+	strFilePath.append(L".");
+	strFilePath.append(ofn.lpstrFilter);
+
+	FILE* pFile = nullptr;
+
+	errno_t errNum = _wfopen_s(&pFile, strFilePath.c_str(), L"wb");
+
+	if (pFile == nullptr || errNum != 0)
+		return;
+
+	int size = CAnimationClip::GetInst()->GetVecClipSize();
+	fwrite(&size, sizeof(int), 1, pFile);
+
+	for (int i = 0; i < size; i++)
+	{
+		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
+		fwrite(sprite, sizeof(CSprite), 1, pFile);
+		int width = sprite->GetSize().right - sprite->GetSize().left;
+		int height = sprite->GetSize().bottom - sprite->GetSize().top;
+		fwrite(&width, sizeof(int), 1, pFile);
+		fwrite(&height, sizeof(int), 1, pFile);
+		//for(int i=0; i<height; i++)
+		//	fwrite(&sprite->GetPixel()[i * width], sizeof(DWORD) * width, 1, pFile);
+		fwrite(&sprite->GetPixel()[0], sizeof(DWORD) * width , height, pFile);
+	}
+
+	fclose(pFile);
+}
+
+void CBitmap::LoadClip(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
+{
+	// 이미 클립이 있다면 기존 클립 전부 지우기
+
+	int clipSize = CAnimationClip::GetInst()->GetVecClipSize();
+
+	if (clipSize > 0)
+	{
+		for(int i=0; i<clipSize; i++)
+			CAnimationClip::GetInst()->EraseClip(i);
+	}
+
+	OPENFILENAME ofn;
+	TCHAR lpstrFile[100] = L"";
+	static TCHAR filter[] = L"spr\0*.spr";
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = _hWnd;
+	ofn.lpstrFilter = filter;
+	ofn.lpstrFile = lpstrFile;
+	ofn.nMaxFile = 100;
+	ofn.lpstrInitialDir = L".";
+
+	if (GetOpenFileName(&ofn) == 0) return;
+
+	std::stack<char> s;
+	int i = 0;
+
+	for (int i = wcslen(ofn.lpstrFile); i >= 0; i--)
+	{
+		if (ofn.lpstrFile[i] == '\\')
+			break;
+		char a = ofn.lpstrFile[i];
+		s.push(a);
+	}
+
+	i = 0;
+	TCHAR fileName[100] = L"";
+	while (s.top() != '\0')
+	{
+		fileName[i] = s.top();
+		s.pop();
+		i++;
+	}
+
+	FILE* pFile = nullptr;
+	errno_t errNum = _wfopen_s(&pFile, fileName, L"rb");
+
+	if (pFile == nullptr || errNum != 0)
+		return;
+
+	fread(&clipSize, sizeof(int), 1, pFile);
+	
+	int width, height;
+
+	for (int i = 0; i < clipSize; i++)
+	{
+		CSprite* sprite = new CSprite;
+		fread(sprite, sizeof(CSprite), 1, pFile);
+		fread(&width, sizeof(int), 1, pFile);
+		fread(&height, sizeof(int), 1, pFile);
+		DWORD* pixel = (DWORD*)malloc( sizeof(DWORD) * width * height);
+	
+		//for(int i=0; i<height; i++)
+		//	fread(pixel + (i * width), sizeof(DWORD) * width, 1, pFile);
+		fread(pixel, sizeof(DWORD)  * width, height, pFile);
+	
+		D2D1_BITMAP_PROPERTIES bpp;
+		bpp.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		bpp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+		bpp.dpiX = (FLOAT)0;
+		bpp.dpiY = (FLOAT)0;
+		ID2D1Bitmap* bitmap;
+		sprite->SetPixel(pixel);
+		_pRenderTarget->CreateBitmap(D2D1::SizeU(width, height), pixel, width * 4, &bpp, &bitmap);
+		sprite->SetBitmap(bitmap);
+		CAnimationClip::GetInst()->AddClip(sprite);
+	}
+
+	fclose(pFile);
 }

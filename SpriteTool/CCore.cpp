@@ -1,6 +1,9 @@
 #include "CCore.h"
 #include "CBitmap.h"
 
+//#include <winrt/Windows.Foundation.Collections.h>
+//#include <winrt/Windows.Storage.Pickers.h>
+
 CCore* CCore::m_inst = nullptr;
 
 #pragma comment(lib, "d2d1.lib")
@@ -74,7 +77,7 @@ DWORD* CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRe
 		if (SUCCEEDED(hr))
 		{
 			hr = pILock->GetDataPointer(&cbBufferSize, &pv);
-
+			
 			pPixel = (DWORD*)pv;
 			//pv[0] = 0,0 ÀÇ pixel r, g, b, a 
 			// ff ff 00 00
@@ -93,6 +96,55 @@ DWORD* CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRe
 	if (pDecoder) { pDecoder->Release(); pDecoder = nullptr; }
 
 	return nullptr;
+}
+
+void CCore::SaveBitmaptoFile(PCWSTR _fileName)
+{
+	/*
+	Pickers::FileSavePicker^ savePicker = ref new Pickers::FileSavePicker();
+	auto pngExtensions = ref new Platform::Collections::Vector<Platform::String^>();
+	pngExtensions->Append(".png");
+	savePicker->FileTypeChoices->Insert("PNG file", pngExtensions);
+	auto jpgExtensions = ref new Platform::Collections::Vector<Platform::String^>();
+	jpgExtensions->Append(".jpg");
+	savePicker->FileTypeChoices->Insert("JPEG file", jpgExtensions);
+	auto bmpExtensions = ref new Platform::Collections::Vector<Platform::String^>();
+	bmpExtensions->Append(".bmp");
+	savePicker->FileTypeChoices->Insert("BMP file", bmpExtensions);
+	savePicker->DefaultFileExtension = ".png";
+	savePicker->SuggestedFileName = "SaveScreen";
+	savePicker->SuggestedStartLocation = Pickers::PickerLocationId::PicturesLibrary;
+
+	task<StorageFile^> fileTask(savePicker->PickSaveFileAsync());
+	fileTask.then([=](StorageFile^ file) {
+		if (file != nullptr)
+		{
+			// User selects a file.
+			m_imageFileName = file->Name;
+			GUID wicFormat = GUID_ContainerFormatPng;
+			if (file->FileType == ".bmp")
+			{
+				wicFormat = GUID_ContainerFormatBmp;
+			}
+			else if (file->FileType == ".jpg")
+			{
+				wicFormat = GUID_ContainerFormatJpeg;
+			}
+
+			// Retrieve a stream from the file.
+			task<Streams::IRandomAccessStream^> createStreamTask(file->OpenAsync(FileAccessMode::ReadWrite));
+			createStreamTask.then([=](Streams::IRandomAccessStream^ randomAccessStream) {
+				// Convert the RandomAccessStream to an IStream.
+				ComPtr<IStream> stream;
+				DX::ThrowIfFailed(
+					CreateStreamOverRandomAccessStream(randomAccessStream, IID_PPV_ARGS(&stream))
+				);
+
+				SaveBitmapToStream(m_d2dTargetBitmap, m_wicFactory, m_d2dContext, wicFormat, stream.Get());
+				});
+		}
+		});
+		*/
 }
 
 

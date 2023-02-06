@@ -284,9 +284,14 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case ID_LOAD_IMAGE:
 			CAnimationClip::GetInst()->ClearVecSpriteAndClip();
-			CBitmap::GetInst()->OpenFile(hWnd, m_pRenderTarget);
+			CBitmap::GetInst()->OpenImageFile(hWnd, m_pRenderTarget);
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 			break;
+
+		case ID_SAVE_IMAGE:
+			CBitmap::GetInst()->SaveImageFile(hWnd);
+			break;
+
 		case ID_AUTO_SLICE:
 			m_mode = MouseMode::AutoSlice;
 			AutoSliceSprite();
@@ -396,7 +401,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else if (m_mode == MouseMode::AddClip)
 		{
-			CAnimationClip::GetInst()->AddClip(m_camera, m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+			CAnimationClip::GetInst()->AddClip(m_pRenderTarget, m_camera, m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 		}
 
@@ -453,9 +458,9 @@ void CSpriteWnd::Render()
 		m_pRenderTarget->DrawRectangle(rect, m_pRedBrush);
 	}
 
-	std::wstring wstr = CBitmap::GetInst()->GetPixelColorString(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
-	const WCHAR* strColor = wstr.c_str();
-	m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
+	//std::wstring wstr = CBitmap::GetInst()->GetPixelColorString(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+	//const WCHAR* strColor = wstr.c_str();
+	//m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
 
 	m_pRenderTarget->EndDraw();
 }

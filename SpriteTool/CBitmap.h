@@ -36,15 +36,21 @@ public:
 		}
 	}
 
-	void OpenFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget);
+	void OpenImageFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget);
+	void SaveImageFile(HWND _hWnd);
 	ID2D1Bitmap* GetBitmap() const { return m_bitmap; }
 	D2D1_SIZE_F GetBitmapSize() const { return m_size; }
-	DWORD* GetBitmapPixel() const { return m_bitmapPixel; }
+	DWORD* GetBitmapPixel() const { 
+		return m_bitmapPixel; 
+	}
 
 	void SetBitmap(ID2D1Bitmap* _bitmap) { m_bitmap = _bitmap; }
 	void Render(ID2D1HwndRenderTarget* _pRenderTarget, CCamera* _camera, float _x = 0.f, float _y = 0.f);
 	
 	std::wstring GetPixelColorString(unsigned int _xpos, unsigned int _ypos);
 	void KeyColor(DWORD _keyColor);
+
+	void SaveClip(HWND _hWnd);
+	void LoadClip(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget);
 };
 

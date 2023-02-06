@@ -26,63 +26,70 @@ void CAnimationClip::RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigne
 void CAnimationClip::RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x, float _y, bool _pivot)
 {
 	ID2D1Bitmap* bitmap = CBitmap::GetInst()->GetBitmap();
-	if (!bitmap) return;
+
 	if (idx >= CAnimationClip::GetInst()->GetVecClipSize()) return;
 
 	CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(idx);
 
 	if (!_pivot)
-		_pRenderTarget->DrawBitmap(bitmap, D2D1::RectF(_x, _y,
+		_pRenderTarget->DrawBitmap(sprite->GetBitmap(), 
+			D2D1::RectF(_x, _y,
 			sprite->GetSize().right - sprite->GetSize().left + _x,
 			sprite->GetSize().bottom - sprite->GetSize().top + _y),
 			1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-			D2D1::RectF(sprite->GetSize().left, sprite->GetSize().top, sprite->GetSize().right, sprite->GetSize().bottom));
+			D2D1::RectF(0, 0, sprite->GetSize().right, sprite->GetSize().bottom));
 	else
-		_pRenderTarget->DrawBitmap(bitmap, D2D1::RectF(
+	{
+		//if (!bitmap) return;
+		_pRenderTarget->DrawBitmap(sprite->GetBitmap(), D2D1::RectF(
 			_x - sprite->GetPivotX() * (sprite->GetSize().right - sprite->GetSize().left),
 			_y - sprite->GetPivotY() * (sprite->GetSize().bottom - sprite->GetSize().top),
 			sprite->GetSize().right - sprite->GetSize().left + _x - sprite->GetPivotX() * (sprite->GetSize().right - sprite->GetSize().left),
 			sprite->GetSize().bottom - sprite->GetSize().top + _y - sprite->GetPivotY() * (sprite->GetSize().bottom - sprite->GetSize().top)),
 			1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-			D2D1::RectF(sprite->GetSize().left, sprite->GetSize().top, sprite->GetSize().right, sprite->GetSize().bottom));
+			D2D1::RectF(0, 0, sprite->GetSize().right, sprite->GetSize().bottom));
+	}
 }
 
 void CAnimationClip::AddSprite(CSprite* _sprite)
 {
 	m_vecSprite.push_back(_sprite);
+
 }
 
-void CAnimationClip::AddClip(CCamera* _camera, int _xpos, int _ypos)
+void CAnimationClip::AddClip(ID2D1HwndRenderTarget* _pRenderTarget, CCamera* _camera, int _xpos, int _ypos)
 {
 	if (!_camera) return;
 
 	for (int i = 0; i < m_vecSprite.size(); i++)
 	{
-		CSprite* sprite = m_vecSprite[i]; // AnimWnd에 있는 클립들의 Rect는 다름
-		D2D1_RECT_F rect = sprite->GetSize();
+		CSprite sprite = *m_vecSprite[i]; // AnimWnd에 있는 클립들의 Rect는 다름
+		D2D1_RECT_F rect = sprite.GetSize();
 		rect.left += _camera->GetXPos();
 		rect.right += _camera->GetXPos();
 		rect.top += _camera->GetYPos();
 		rect.bottom += _camera->GetYPos();
 		if (rect.left <= _xpos && _xpos <= rect.right && rect.top <= _ypos && rect.bottom >= _ypos)
 		{
-			m_vecClip.push_back(sprite);
+			sprite.CopyPixel(_pRenderTarget);
+			CSprite* s = new CSprite(sprite);
+			m_vecClip.push_back(s);
 			break;
 		}
 	}
 }
-/*
+
 CSprite* CAnimationClip::GetVecSprite(int idx) const
 {
 	if (idx < 0) return nullptr;
 	if (idx >= m_vecSprite.size()) return nullptr;
 	return m_vecSprite[idx];
 }
-*/
-CSprite* CAnimationClip::GetVecClip(int idx) const
+
+CSprite* CAnimationClip::GetVecClip(int idx) 
 {
-	if (idx < 0) return nullptr;
-	if (idx >= m_vecClip.size()) return nullptr;
+	if (idx < 0) return {};
+	if (idx >= m_vecClip.size()) return {};
 	return m_vecClip[idx];
 }
 

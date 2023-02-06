@@ -2,8 +2,8 @@
 
 #include <vector>
 #include <d2d1.h>
+#include "CSprite.h"
 
-class CSprite;
 class CCamera;
 
 class CAnimationClip
@@ -37,17 +37,13 @@ public:
 
 	unsigned int GetVecSpriteSize() const { return m_vecSprite.size(); }
 	unsigned int GetVecClipSize() const { return m_vecClip.size(); }
-	CSprite* GetVecSprite(int idx) const
-	{
-		if (idx < 0) return nullptr;
-		if (idx >= m_vecSprite.size()) return nullptr;
-		return m_vecSprite[idx];
-	}
-	CSprite* GetVecClip(int idx) const;
+	CSprite* GetVecSprite(int idx) const;
+	CSprite* GetVecClip(int idx);
 	CSprite* GetClipInPos(int _xpos, int _ypos, D2D1_RECT_F& _r, CCamera* _camera);
 
 	void AddSprite(CSprite* _sprite);
-	void AddClip(CCamera* _camera, int _xpos, int _ypos);
+	void AddClip(ID2D1HwndRenderTarget* _pRenderTarget, CCamera* _camera, int _xpos, int _ypos);
+	void AddClip(CSprite* _sprite) {	m_vecClip.push_back(_sprite); }
 
 	void EraseClip(unsigned int idx);
 	void EraseSprite(unsigned int idx);
