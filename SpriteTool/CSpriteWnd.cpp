@@ -303,8 +303,24 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			m_mode = MouseMode::AddClip;
 			break;
 		case ID_KEY_COLOR:
+		{
 			CBitmap::GetInst()->KeyColor(m_keyColor);
+			D2D1_BITMAP_PROPERTIES bpp;
+			bpp.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+			bpp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+			bpp.dpiX = (FLOAT)0;
+			bpp.dpiY = (FLOAT)0;
+
+			CBitmap::GetInst()->GetBitmap()->Release();
+			ID2D1Bitmap* bitmap;
+			m_pRenderTarget->CreateBitmap(D2D1::SizeU(CBitmap::GetInst()->GetBitmapSize().width,
+				CBitmap::GetInst()->GetBitmapSize().height),
+				CBitmap::GetInst()->GetBitmapPixel(),
+				CBitmap::GetInst()->GetBitmapSize().width * 4, &bpp, &bitmap);
+			CBitmap::GetInst()->SetBitmap(bitmap);
+			InvalidateRgn(hWnd, NULL, false);
 			break;
+		}
 		case ID_SPRITE:
 			m_mode = MouseMode::RemoveSprite;
 
@@ -458,9 +474,9 @@ void CSpriteWnd::Render()
 		m_pRenderTarget->DrawRectangle(rect, m_pRedBrush);
 	}
 
-	//std::wstring wstr = CBitmap::GetInst()->GetPixelColorString(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
-	//const WCHAR* strColor = wstr.c_str();
-	//m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
+	std::wstring wstr = CBitmap::GetInst()->GetPixelColorString(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+	const WCHAR* strColor = wstr.c_str();
+	m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
 
 	m_pRenderTarget->EndDraw();
 }

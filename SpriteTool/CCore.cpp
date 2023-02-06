@@ -98,53 +98,127 @@ DWORD* CCore::LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRe
 	return nullptr;
 }
 
-void CCore::SaveBitmaptoFile(PCWSTR _fileName)
+void CCore::SaveBitmaptoFile(PCWSTR _fileName, ID2D1Bitmap* _pBitmap)
 {
-	/*
-	Pickers::FileSavePicker^ savePicker = ref new Pickers::FileSavePicker();
-	auto pngExtensions = ref new Platform::Collections::Vector<Platform::String^>();
-	pngExtensions->Append(".png");
-	savePicker->FileTypeChoices->Insert("PNG file", pngExtensions);
-	auto jpgExtensions = ref new Platform::Collections::Vector<Platform::String^>();
-	jpgExtensions->Append(".jpg");
-	savePicker->FileTypeChoices->Insert("JPEG file", jpgExtensions);
-	auto bmpExtensions = ref new Platform::Collections::Vector<Platform::String^>();
-	bmpExtensions->Append(".bmp");
-	savePicker->FileTypeChoices->Insert("BMP file", bmpExtensions);
-	savePicker->DefaultFileExtension = ".png";
-	savePicker->SuggestedFileName = "SaveScreen";
-	savePicker->SuggestedStartLocation = Pickers::PickerLocationId::PicturesLibrary;
+	HRESULT hr = S_OK;
 
-	task<StorageFile^> fileTask(savePicker->PickSaveFileAsync());
-	fileTask.then([=](StorageFile^ file) {
-		if (file != nullptr)
-		{
-			// User selects a file.
-			m_imageFileName = file->Name;
-			GUID wicFormat = GUID_ContainerFormatPng;
-			if (file->FileType == ".bmp")
-			{
-				wicFormat = GUID_ContainerFormatBmp;
-			}
-			else if (file->FileType == ".jpg")
-			{
-				wicFormat = GUID_ContainerFormatJpeg;
-			}
+	ID2D1Factory* pD2DFactory = NULL;
+	IWICBitmap* pWICBitmap = NULL;
+	ID2D1RenderTarget* pRT = NULL;
+	IWICBitmapEncoder* pEncoder = NULL;
+	IWICBitmapFrameEncode* pFrameEncode = NULL;
+	IWICStream* pStream = NULL;
 
-			// Retrieve a stream from the file.
-			task<Streams::IRandomAccessStream^> createStreamTask(file->OpenAsync(FileAccessMode::ReadWrite));
-			createStreamTask.then([=](Streams::IRandomAccessStream^ randomAccessStream) {
-				// Convert the RandomAccessStream to an IStream.
-				ComPtr<IStream> stream;
-				DX::ThrowIfFailed(
-					CreateStreamOverRandomAccessStream(randomAccessStream, IID_PPV_ARGS(&stream))
-				);
+	//if (SUCCEEDED(hr))
+	//{
+	//	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pD2DFactory);
+	//}
 
-				SaveBitmapToStream(m_d2dTargetBitmap, m_wicFactory, m_d2dContext, wicFormat, stream.Get());
-				});
-		}
-		});
-		*/
+	//
+	// Create IWICBitmap and RT
+	//
+
+	UINT sc_bitmapWidth = _pBitmap->GetSize().width;
+	UINT sc_bitmapHeight = _pBitmap->GetSize().height;
+
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pWICFactory->CreateBitmap(
+			sc_bitmapWidth,
+			sc_bitmapHeight,
+			GUID_WICPixelFormat32bppPBGRA,
+			WICBitmapCacheOnLoad,
+			&pWICBitmap
+		);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
+		rtProps.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
+		rtProps.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
+		rtProps.usage = D2D1_RENDER_TARGET_USAGE_NONE;
+
+		
+		hr = m_pD2DFactory->CreateWicBitmapRenderTarget(
+			pWICBitmap,
+			rtProps,
+			&pRT
+		);
+	}
+
+	D2D1_BITMAP_PROPERTIES bpp;
+	bpp.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	bpp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+	bpp.dpiX = (FLOAT)0;
+	bpp.dpiY = (FLOAT)0;
+
+	ID2D1Bitmap* bitmap;
+
+	pRT->CreateBitmap(D2D1::SizeU(sc_bitmapWidth, sc_bitmapHeight), CBitmap::GetInst()->GetBitmapPixel(), sc_bitmapWidth * 4, &bpp, &bitmap);
+
+	if (SUCCEEDED(hr))
+	{
+		pRT->BeginDraw();
+		//pRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
+
+		pRT->DrawBitmap(bitmap);
+
+		hr = pRT->EndDraw();
+	}
+
+	if (SUCCEEDED(hr))
+	{
+
+		//
+		// Save image to file
+		//
+		hr = m_pWICFactory->CreateStream(&pStream);
+	}
+
+	WICPixelFormatGUID format = GUID_WICPixelFormat32bppPBGRA;
+	if (SUCCEEDED(hr))
+	{
+
+		hr = pStream->InitializeFromFilename(_fileName, GENERIC_WRITE);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pWICFactory->CreateEncoder(GUID_ContainerFormatPng, NULL, &pEncoder);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pEncoder->Initialize(pStream, WICBitmapEncoderNoCache);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pEncoder->CreateNewFrame(&pFrameEncode, NULL);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameEncode->Initialize(NULL);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameEncode->SetSize(sc_bitmapWidth, sc_bitmapHeight);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameEncode->SetPixelFormat(&format);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameEncode->WriteSource(pWICBitmap, NULL);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameEncode->Commit();
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pEncoder->Commit();
+	}
 }
 
 

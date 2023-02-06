@@ -97,39 +97,10 @@ void CBitmap::SaveImageFile(HWND _hWnd)
 	if (pFile == nullptr || errNum != 0)
 		return;
 
-	BITMAPFILEHEADER fileHeader;
-	BITMAPINFOHEADER infoHeader;
-
-	fileHeader.bfType = 0x4d42;
-	fileHeader.bfSize = 4 * m_size.width * m_size.height + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-	fileHeader.bfReserved1 = 0;
-	fileHeader.bfReserved2 = 0;
-	fileHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-
-	infoHeader.biSize = sizeof(infoHeader);
-	infoHeader.biWidth = m_size.width;
-	infoHeader.biHeight = m_size.height;
-	infoHeader.biPlanes = 1;
-	infoHeader.biBitCount = 32;
-	infoHeader.biCompression = BI_PNG;
-	infoHeader.biSizeImage = 0;
-	infoHeader.biXPelsPerMeter = 0;
-	infoHeader.biYPelsPerMeter = 0;
-	infoHeader.biClrUsed = 0;
-	infoHeader.biClrImportant = 0;
-
-	DWORD dwTmp;
-
-	int size1 = sizeof(fileHeader);
-
-	fwrite((char*)&fileHeader, sizeof(fileHeader), 1, pFile);
-	fwrite((char*)&infoHeader, sizeof(infoHeader), 1, pFile);
-	fwrite((DWORD*)&m_bitmapPixel, sizeof(DWORD) * m_size.width * m_size.height, 1, pFile);
-
 	fclose(pFile);
 	
 
-	//hr = m_pWICFactory->CreateStream(&pStream);
+	CCore::GetInst()->SaveBitmaptoFile(strFilePath.c_str(), m_bitmap);
 }
 
 void CBitmap::Render(ID2D1HwndRenderTarget* _pRenderTarget, CCamera* _camera, float _x, float _y)

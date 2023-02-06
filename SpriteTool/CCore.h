@@ -43,5 +43,5 @@ public:
 
 	void CleanupDevice();
 	DWORD* LoadBitmapFromFile(PCWSTR _wcFileName, ID2D1HwndRenderTarget* _pRenderTarget, ID2D1Bitmap** _pBitmap, D2D1_SIZE_F* _size);
-	void SaveBitmaptoFile(PCWSTR _fileName);
+	void SaveBitmaptoFile(PCWSTR _fileName, ID2D1Bitmap* _pBitmap);
 };

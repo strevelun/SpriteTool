@@ -59,7 +59,10 @@ void CAnimationClip::AddSprite(CSprite* _sprite)
 
 void CAnimationClip::AddClip(ID2D1HwndRenderTarget* _pRenderTarget, CCamera* _camera, int _xpos, int _ypos)
 {
+	// AddClip을 하면 기존에 vecClip은 전부 삭제. 
+
 	if (!_camera) return;
+
 
 	for (int i = 0; i < m_vecSprite.size(); i++)
 	{
@@ -137,6 +140,7 @@ void CAnimationClip::EraseSprite(unsigned int idx)
 	m_vecSprite.erase(m_vecSprite.begin() + idx);
 }
 
+// TODO 고쳐야 함
 void CAnimationClip::ClearVecSpriteAndClip()
 {
 	int size = m_vecSprite.size();
