@@ -26,12 +26,13 @@ private:
 
 	DWORD m_keyColor = 0;
 	int m_count = 0;
+	int m_addClips = 0;
 
 private:
 	void Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY);
 	void AutoSliceSprite();
 	void DragSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY);
-	void RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY);
+	void RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY, int& _addClips);
 
 
 public:

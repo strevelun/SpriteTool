@@ -191,7 +191,7 @@ void CSpriteWnd::DragSprite(CCamera* _camera, int _startPosX, int _startPosY, in
 	CAnimationClip::GetInst()->AddSprite(sprite);
 }
 
-void CSpriteWnd::RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY)
+void CSpriteWnd::RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY, int& _addClips)
 {
 	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
 
@@ -230,6 +230,7 @@ void CSpriteWnd::RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, 
 				if (r.left == r2.left && r.top == r2.top && r.right == r2.right && r.bottom == r2.bottom)
 				{
 					CAnimationClip::GetInst()->EraseClip(j);
+					_addClips++;
 					break;
 				}
 			}
@@ -284,6 +285,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case ID_LOAD_IMAGE:
 			CAnimationClip::GetInst()->ClearVecSpriteAndClip();
+			m_addClips = 0;
 			CBitmap::GetInst()->OpenImageFile(hWnd, m_pRenderTarget);
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 			break;
@@ -329,6 +331,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			CAnimationClip::GetInst()->ClearVecSpriteAndClip();
 			InvalidateRgn(m_hWnd, NULL, false);
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
+			m_addClips = 0;
 			break;
 		}
 		break;
@@ -412,13 +415,14 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else if (m_mode == MouseMode::RemoveSprite)
 		{
 			RemoveSprite(m_camera, m_pMouse->GetStartMouseX(), m_pMouse->GetStartMouseY(),
-				m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+				m_pMouse->GetMouseX(), m_pMouse->GetMouseY(), m_addClips);
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 		}
 		else if (m_mode == MouseMode::AddClip)
 		{
 			CAnimationClip::GetInst()->AddClip(m_pRenderTarget, m_camera, m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
+			m_addClips++;
 		}
 
 		InvalidateRgn(m_hWnd, NULL, false);
@@ -463,7 +467,7 @@ void CSpriteWnd::Render()
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 	}
 
-	for (int i = 0; i < CAnimationClip::GetInst()->GetVecClipSize(); i++)
+	for (int i = 0; i < m_addClips; i++)
 	{
 		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
 		D2D1_RECT_F rect = sprite->GetSize();

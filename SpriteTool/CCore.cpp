@@ -109,43 +109,29 @@ void CCore::SaveBitmaptoFile(PCWSTR _fileName, ID2D1Bitmap* _pBitmap)
 	IWICBitmapFrameEncode* pFrameEncode = NULL;
 	IWICStream* pStream = NULL;
 
-	//if (SUCCEEDED(hr))
-	//{
-	//	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pD2DFactory);
-	//}
-
-	//
-	// Create IWICBitmap and RT
-	//
-
 	UINT sc_bitmapWidth = _pBitmap->GetSize().width;
 	UINT sc_bitmapHeight = _pBitmap->GetSize().height;
+	
+	hr = m_pWICFactory->CreateBitmap(
+		sc_bitmapWidth,
+		sc_bitmapHeight,
+		GUID_WICPixelFormat32bppPBGRA,
+		WICBitmapCacheOnLoad,
+		&pWICBitmap);
+	if (!SUCCEEDED(hr)) return;
 
-	if (SUCCEEDED(hr))
-	{
-		hr = m_pWICFactory->CreateBitmap(
-			sc_bitmapWidth,
-			sc_bitmapHeight,
-			GUID_WICPixelFormat32bppPBGRA,
-			WICBitmapCacheOnLoad,
-			&pWICBitmap
-		);
-	}
-
-	if (SUCCEEDED(hr))
-	{
-		D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
-		rtProps.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
-		rtProps.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
-		rtProps.usage = D2D1_RENDER_TARGET_USAGE_NONE;
+	D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
+	rtProps.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
+	rtProps.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
+	rtProps.usage = D2D1_RENDER_TARGET_USAGE_NONE;
 
 		
-		hr = m_pD2DFactory->CreateWicBitmapRenderTarget(
-			pWICBitmap,
-			rtProps,
-			&pRT
-		);
-	}
+	hr = m_pD2DFactory->CreateWicBitmapRenderTarget(
+		pWICBitmap,
+		rtProps,
+		&pRT
+	);
+	if (!SUCCEEDED(hr)) return;
 
 	D2D1_BITMAP_PROPERTIES bpp;
 	bpp.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -157,68 +143,45 @@ void CCore::SaveBitmaptoFile(PCWSTR _fileName, ID2D1Bitmap* _pBitmap)
 
 	pRT->CreateBitmap(D2D1::SizeU(sc_bitmapWidth, sc_bitmapHeight), CBitmap::GetInst()->GetBitmapPixel(), sc_bitmapWidth * 4, &bpp, &bitmap);
 
-	if (SUCCEEDED(hr))
-	{
-		pRT->BeginDraw();
-		//pRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
+	pRT->BeginDraw();
+	pRT->DrawBitmap(bitmap);
+	hr = pRT->EndDraw();
+	if (!SUCCEEDED(hr)) return;
 
-		pRT->DrawBitmap(bitmap);
-
-		hr = pRT->EndDraw();
-	}
-
-	if (SUCCEEDED(hr))
-	{
-
-		//
-		// Save image to file
-		//
-		hr = m_pWICFactory->CreateStream(&pStream);
-	}
+	hr = m_pWICFactory->CreateStream(&pStream);
+	if (!SUCCEEDED(hr)) return;
 
 	WICPixelFormatGUID format = GUID_WICPixelFormat32bppPBGRA;
-	if (SUCCEEDED(hr))
-	{
 
-		hr = pStream->InitializeFromFilename(_fileName, GENERIC_WRITE);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = m_pWICFactory->CreateEncoder(GUID_ContainerFormatPng, NULL, &pEncoder);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pEncoder->Initialize(pStream, WICBitmapEncoderNoCache);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pEncoder->CreateNewFrame(&pFrameEncode, NULL);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pFrameEncode->Initialize(NULL);
-	}
+	hr = pStream->InitializeFromFilename(_fileName, GENERIC_WRITE);
+	if (!SUCCEEDED(hr)) return;
 
-	if (SUCCEEDED(hr))
-	{
-		hr = pFrameEncode->SetSize(sc_bitmapWidth, sc_bitmapHeight);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pFrameEncode->SetPixelFormat(&format);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pFrameEncode->WriteSource(pWICBitmap, NULL);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pFrameEncode->Commit();
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pEncoder->Commit();
-	}
+	hr = m_pWICFactory->CreateEncoder(GUID_ContainerFormatPng, NULL, &pEncoder);
+	if (!SUCCEEDED(hr)) return;
+	
+	hr = pEncoder->Initialize(pStream, WICBitmapEncoderNoCache);
+	if (!SUCCEEDED(hr)) return;
+	
+	hr = pEncoder->CreateNewFrame(&pFrameEncode, NULL);
+	if (!SUCCEEDED(hr)) return;
+	
+	hr = pFrameEncode->Initialize(NULL);
+	if (!SUCCEEDED(hr)) return;
+	
+	hr = pFrameEncode->SetSize(sc_bitmapWidth, sc_bitmapHeight);
+	if (!SUCCEEDED(hr)) return;
+	
+	hr = pFrameEncode->SetPixelFormat(&format);
+	if (!SUCCEEDED(hr)) return;
+	
+	hr = pFrameEncode->WriteSource(pWICBitmap, NULL);
+	if (!SUCCEEDED(hr)) return;
+	
+	hr = pFrameEncode->Commit();
+	if (!SUCCEEDED(hr)) return;
+	
+	hr = pEncoder->Commit();
+	if (!SUCCEEDED(hr)) return;
 }
 
 
