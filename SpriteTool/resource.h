@@ -4,6 +4,7 @@
 //
 #define IDR_MENU1                       101
 #define IDR_MENU2                       102
+#define IDD_DIALOG1                     105
 #define ID_LOAD_IMAGE                   40001
 #define ID_AUTO_SLICE                   40002
 #define ID_DRAG_SLICE                   40003
@@ -15,14 +16,17 @@
 #define ID_ANIMATION                    40009
 #define ID_SAVE_IMAGE                   40010
 #define ID_SAVE_CLIPS                   40011
-#define ID_LOAD_CLIP                        40012
+#define ID_LOAD_CLIP                    40012
+#define ID_GRID_SLICE                   40013
+#define IDC_EDIT						40014
+#define IDC_EDIT2						40015
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        103
-#define _APS_NEXT_COMMAND_VALUE         40013
+#define _APS_NEXT_RESOURCE_VALUE        109
+#define _APS_NEXT_COMMAND_VALUE         40014
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

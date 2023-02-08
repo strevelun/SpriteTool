@@ -8,7 +8,6 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "winres.h"
-
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -32,8 +31,7 @@ END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""winres.h""\r\n"
-    "\0"
+    "#include ""winres.h""\0"
 END
 
 3 TEXTINCLUDE 
@@ -62,6 +60,7 @@ BEGIN
         MENUITEM "AutoSlice",                   ID_AUTO_SLICE
         MENUITEM "DragSlice",                   ID_DRAG_SLICE
         MENUITEM "AddClip",                     ID_ADD_CLIP
+        MENUITEM "GridSlice",                   ID_GRID_SLICE
     END
     POPUP "삭제"
     BEGIN
@@ -77,12 +76,61 @@ BEGIN
     BEGIN
         MENUITEM "피벗",                          ID_PIVOT
         MENUITEM "저장",                          ID_SAVE_CLIPS
-        MENUITEM "불러오기", ID_LOAD_CLIP
+        MENUITEM "불러오기",                        ID_LOAD_CLIP
     END
     POPUP "보기"
     BEGIN
         MENUITEM "애니메이션",                       ID_ANIMATION
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG1 DIALOGEX 0, 0, 304, 116
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT,7,72,75,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT2,107,72,73,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "확인",IDOK,191,72,50,12
+    PUSHBUTTON      "취소",IDCANCEL,247,72,50,12
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 297
+        TOPMARGIN, 72
+        BOTTOMMARGIN, 84
+        HORZGUIDE, 72
+        HORZGUIDE, 84
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG1 AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 #endif    // 한국어(대한민국) resources

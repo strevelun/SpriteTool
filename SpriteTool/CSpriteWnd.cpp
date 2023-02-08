@@ -15,6 +15,10 @@
 #pragma comment( lib, "d2d1.lib " ) 
 #pragma comment(lib, "winmm.lib") 
 
+int s_gridX, s_gridY;
+
+INT_PTR CALLBACK GridDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+
 void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY)
 {
 	int curX = _curX, curY = _curY;
@@ -90,7 +94,6 @@ void CSpriteWnd::AutoSliceSprite()
 	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
 
 	std::vector<std::vector<int>> visited(size.height, std::vector<int>(size.width, 0));
-	//int curSprite = 1;
 
 	DWORD first = timeGetTime();
 
@@ -98,19 +101,6 @@ void CSpriteWnd::AutoSliceSprite()
 	{
 		for (int j = 0; j < size.width; j++)
 		{
-			/*
-			CSprite* sprite = CAnimationClip::GetInst()->GetVecSprite(visited[i][j] - 1);
-			if (sprite)
-			{
-				D2D1_RECT_F rect = sprite->GetSize();
-				int width = rect.right - rect.left;
-				if (rect.left <= j && j <= rect.right && rect.top <= i && i <= rect.bottom)
-					j += width - j + rect.left+1;
-
-				if (j >= size.width)
-					j = size.width - 1;
-			}
-			*/
 			if (visited[i][j]) continue;
 
 			if ( bitmapPixel[i * (int)size.width + j] & 0xff000000)  // 0xffff00000
@@ -243,6 +233,38 @@ void CSpriteWnd::RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, 
 	}
 }
 
+void CSpriteWnd::GridSlice()
+{
+	if (s_gridX <= 0 || s_gridY <= 0)
+		return;
+
+	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
+	int tileWidth = size.width / s_gridX;
+	int tileHeight = size.height / s_gridY;
+	int left = 0, top = 0, right = tileWidth, bottom = tileHeight;
+	D2D1_RECT_F rect;
+
+	for (int i = 0; i < size.height / tileHeight; i++)
+	{
+		for (int j = 0; j < size.width / tileWidth; j++)
+		{
+			rect.left =  left;
+			rect.top =  top;
+			rect.right =  right;
+			rect.bottom =  bottom;
+			CSprite *sprite = new CSprite(rect);
+			CAnimationClip::GetInst()->AddSprite(sprite);
+
+			left += tileWidth;
+			right += tileWidth;
+		}
+		left = 0;
+		right = tileWidth;
+		top += tileHeight;
+		bottom += tileHeight;
+	}
+}
+
 CSpriteWnd::CSpriteWnd(HINSTANCE hInstance)
 {
 	m_hInst = hInstance;
@@ -304,6 +326,15 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case ID_ADD_CLIP:
 			m_mode = MouseMode::AddClip;
 			break;
+
+		case ID_GRID_SLICE:
+			DialogBox(m_hInst,                   // application instance
+				MAKEINTRESOURCE(IDD_DIALOG1), // dialog box resource
+				hWnd,                          // owner window
+				GridDialogProc // dialog box window procedure
+			);
+			break;
+
 		case ID_KEY_COLOR:
 		{
 			CBitmap::GetInst()->KeyColor(m_keyColor);
@@ -483,4 +514,113 @@ void CSpriteWnd::Render()
 	m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
 
 	m_pRenderTarget->EndDraw();
+}
+
+INT_PTR CALLBACK GridDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	TCHAR gridX[5], gridY[5];
+	WORD gridXLength = 0, gridYLength = 0;
+
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		// Set the default push button to "Cancel." 
+		SendMessage(hDlg,
+			DM_SETDEFID,
+			(WPARAM)IDCANCEL,
+			(LPARAM)0);
+
+		return TRUE;
+
+	case WM_COMMAND:
+		// Set the default push button to "OK" when the user enters text. 
+		if (HIWORD(wParam) == EN_CHANGE )//&&
+			//LOWORD(wParam) == IDE_PASSWORDEDIT)
+		{
+			SendMessage(hDlg,
+				DM_SETDEFID,
+				(WPARAM)IDOK,
+				(LPARAM)0);
+		}
+		switch (wParam)
+		{
+		case IDOK:
+		{
+			// Get number of characters. 
+			gridXLength = (WORD)SendDlgItemMessage(hDlg,
+				IDC_EDIT,
+				EM_LINELENGTH,
+				(WPARAM)0,
+				(LPARAM)0);
+
+			gridYLength = (WORD)SendDlgItemMessage(hDlg,
+				IDC_EDIT2,
+				EM_LINELENGTH,
+				(WPARAM)0,
+				(LPARAM)0);
+
+			if (gridXLength >= 5 || gridYLength >= 5)
+			{
+				MessageBox(hDlg,
+					L"Too many characters.",
+					L"Error",
+					MB_OK);
+
+				EndDialog(hDlg, TRUE);
+				return FALSE;
+			}
+			else if (gridXLength == 0 || gridYLength == 0)
+			{
+				MessageBox(hDlg,
+					L"No characters entered.",
+					L"Error",
+					MB_OK);
+
+				EndDialog(hDlg, TRUE);
+				return FALSE;
+			}
+
+			// Put the number of characters into first word of buffer. 
+			*((LPWORD)gridX) = gridXLength;
+			*((LPWORD)gridY) = gridYLength;
+
+			// Get the characters. 
+			SendDlgItemMessage(hDlg,
+				IDC_EDIT,
+				EM_GETLINE,
+				(WPARAM)0,       // line 0 
+				(LPARAM)gridX);
+
+			SendDlgItemMessage(hDlg,
+				IDC_EDIT2,
+				EM_GETLINE,
+				(WPARAM)0,       // line 0 
+				(LPARAM)gridY);
+
+			// Null-terminate the string. 
+			gridX[gridXLength] = 0;
+			gridY[gridYLength] = 0;
+
+
+			char input[5];
+			WideCharToMultiByte(CP_ACP, 0, gridX, 5, input, 5, NULL, NULL);
+			int n = atoi(input);
+			s_gridX = n;
+			WideCharToMultiByte(CP_ACP, 0, gridY, 5, input, 5, NULL, NULL);
+			n = atoi(input);
+			s_gridY = n;
+			CApp::GetInst()->GetSpriteWnd()->GridSlice();
+
+			EndDialog(hDlg, TRUE);
+			return TRUE;
+		}
+		case IDCANCEL:
+			EndDialog(hDlg, TRUE);
+			return TRUE;
+		}
+		return 0;
+	}
+	return FALSE;
+
+	UNREFERENCED_PARAMETER(lParam);
 }

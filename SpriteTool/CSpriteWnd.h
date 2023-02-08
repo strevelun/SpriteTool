@@ -34,15 +34,15 @@ private:
 	void DragSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY);
 	void RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY, int& _addClips);
 
-
 public:
 	CSpriteWnd(HINSTANCE _hInstance);
 	~CSpriteWnd();
 
 	bool Create(int _width, int _height, int nCmdShow);
 	LRESULT Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	void GridSlice();
 
 	void Render();
-	//D2D1_RECT_F DetectSprite(HWND _hWnd, int _startPosX, int _startPosY, int _endPosX, int _endPosY);
+
 };
 
