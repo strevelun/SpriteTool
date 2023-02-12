@@ -50,7 +50,7 @@ public:
 	std::wstring GetPixelColorString(unsigned int _xpos, unsigned int _ypos);
 	void KeyColor(DWORD _keyColor);
 
-	void SaveClip(HWND _hWnd);
+	void SaveClip(HWND _hWnd, Type _type);
 	void LoadClip(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget);
 };
 

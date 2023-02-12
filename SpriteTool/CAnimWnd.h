@@ -9,11 +9,19 @@ class CAnimViewWnd;
 class CSprite;
 class CCamera;
 
+enum class Type
+{
+	Tile,
+	Block,
+	Character
+};
+
 class CAnimWnd : public CBWnd
 {
 	CBitmap* m_pImage = nullptr;
 	CAnimViewWnd* m_viewWnd = nullptr;
 	CCamera* m_camera = nullptr;
+
 
 public:
 	CAnimWnd(HINSTANCE _hInstance);

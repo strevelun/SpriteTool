@@ -305,6 +305,8 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		switch (LOWORD(wParam))
 		{
+		
+
 		case ID_LOAD_IMAGE:
 			CAnimationClip::GetInst()->ClearVecSpriteAndClip();
 			m_addClips = 0;

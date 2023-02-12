@@ -3,6 +3,7 @@
 #include "CSprite.h"
 #include "CAnimationClip.h"
 #include "CCamera.h"
+#include "CAnimWnd.h"
 
 #include <sstream>
 #include <iomanip>
@@ -140,7 +141,7 @@ void CBitmap::KeyColor(DWORD _keyColor)
 	}
 }
 
-void CBitmap::SaveClip(HWND _hWnd)
+void CBitmap::SaveClip(HWND _hWnd, Type _type)
 {
 	if (!m_bitmap)	return;
 	if (CAnimationClip::GetInst()->GetVecClipSize() <= 0) return;
@@ -171,6 +172,7 @@ void CBitmap::SaveClip(HWND _hWnd)
 
 	int size = CAnimationClip::GetInst()->GetVecClipSize();
 	fwrite(&size, sizeof(int), 1, pFile);
+	fwrite(&_type, sizeof(Type), 1, pFile);
 
 	for (int i = 0; i < size; i++)
 	{

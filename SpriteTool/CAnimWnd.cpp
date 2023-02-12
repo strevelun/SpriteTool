@@ -11,6 +11,54 @@
 
 #include <windowsx.h>
 
+Type type = Type::Tile;
+
+BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	int id, event;
+	DWORD state;
+
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		SendMessage(GetDlgItem(hwndDlg, IDC_TYPE_TILE), BM_SETCHECK, BST_CHECKED, 0);
+		SendMessage(GetDlgItem(hwndDlg, IDC_TYPE_BLOCK), BM_SETCHECK, BST_UNCHECKED, 0);
+		SendMessage(GetDlgItem(hwndDlg, IDC_TYPE_CHARACTER), BM_SETCHECK, BST_UNCHECKED, 0);
+		
+		return TRUE;
+
+	case WM_COMMAND:
+		id = LOWORD(wParam);
+		event = HIWORD(wParam);
+
+		switch (id)
+		{
+		case IDC_TYPE_TILE:
+			if (event == BN_CLICKED) {
+				type = Type::Tile;
+			}
+
+		case IDC_TYPE_BLOCK:
+			if (event == BN_CLICKED) {
+				type = Type::Block;
+			}
+			
+		case IDC_TYPE_CHARACTER:
+			if (event == BN_CLICKED) {
+				type = Type::Character;
+			}
+			break;
+
+		case IDOK:
+			CBitmap::GetInst()->SaveClip(hwndDlg, type);
+			EndDialog(hwndDlg, TRUE);
+			return TRUE;
+		}
+		return FALSE;
+	}
+	return FALSE;
+}
+
 CAnimWnd::CAnimWnd(HINSTANCE hInstance)
 {
 	m_hInst = hInstance;
@@ -38,6 +86,8 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hdc;
+	static HWND hwndRadioButton1, hwndRadioButton2, hwndRadioButton3;
+
 
 	switch (message)
 	{
@@ -49,7 +99,9 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case ID_SAVE_CLIPS:
 		{
-			CBitmap::GetInst()->SaveClip(hWnd);
+			type = Type::Tile;
+			DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG2), NULL, (DLGPROC)DialogProc);
+
 			break;
 		}
 
