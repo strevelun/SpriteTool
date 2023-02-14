@@ -5,6 +5,7 @@
 
 class CSprite;
 class CCamera;
+enum class Type;
 
 class CBitmap
 {

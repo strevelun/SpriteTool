@@ -37,11 +37,13 @@ BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPara
 			if (event == BN_CLICKED) {
 				type = Type::Tile;
 			}
+			break;
 
 		case IDC_TYPE_BLOCK:
 			if (event == BN_CLICKED) {
 				type = Type::Block;
 			}
+			break;
 			
 		case IDC_TYPE_CHARACTER:
 			if (event == BN_CLICKED) {
@@ -194,11 +196,11 @@ void CAnimWnd::Render()
 	{
 		CSprite* clip = CAnimationClip::GetInst()->GetVecClip(i);
 		CAnimationClip::GetInst()->RenderClip(m_pRenderTarget, i, pos + m_camera->GetXPos());
-		D2D1_RECT_F rect = clip->GetSize();
+		D2D1_RECT_F rect = clip->GetRect();
 		rect.left = pos + m_camera->GetXPos();
 		rect.bottom -= rect.top;
 		rect.top = 0;
-		pos += clip->GetSize().right - clip->GetSize().left;
+		pos += clip->GetRect().right - clip->GetRect().left;
 		rect.right = pos + m_camera->GetXPos();
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 

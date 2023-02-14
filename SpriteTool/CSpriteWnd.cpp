@@ -210,13 +210,13 @@ void CSpriteWnd::RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, 
 	for (int i = 0; i < CAnimationClip::GetInst()->GetVecSpriteSize(); i++)
 	{
 		CSprite* sprite = CAnimationClip::GetInst()->GetVecSprite(i);
-		D2D1_RECT_F r = sprite->GetSize();
+		D2D1_RECT_F r = sprite->GetRect();
 		if (_startPosX <= r.left && r.right <= _endPosX && _startPosY <= r.top && _endPosY >= r.bottom)
 		{
 			for (int j = 0; j < CAnimationClip::GetInst()->GetVecClipSize(); j++)
 			{
 				CSprite* sprite2 = CAnimationClip::GetInst()->GetVecClip(j);
-				D2D1_RECT_F r2 = sprite2->GetSize();
+				D2D1_RECT_F r2 = sprite2->GetRect();
 				if (r.left == r2.left && r.top == r2.top && r.right == r2.right && r.bottom == r2.bottom)
 				{
 					CAnimationClip::GetInst()->EraseClip(j);
@@ -429,6 +429,9 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		DWORD* pixel = CBitmap::GetInst()->GetBitmapPixel();
 		if (!pixel)
 			break;
+		if (xpos >= CBitmap::GetInst()->GetBitmapSize().width) break;
+		if (ypos >= CBitmap::GetInst()->GetBitmapSize().height) break;
+
 		m_keyColor = pixel[ypos * (int)CBitmap::GetInst()->GetBitmapSize().width + xpos];
 
 		break;
@@ -492,7 +495,7 @@ void CSpriteWnd::Render()
 	for(int i=0; i< CAnimationClip::GetInst()->GetVecSpriteSize(); i++)
 	{
 		CSprite * sprite = CAnimationClip::GetInst()->GetVecSprite(i);
-		D2D1_RECT_F rect = sprite->GetSize();
+		D2D1_RECT_F rect = sprite->GetRect();
 		rect.left += m_camera->GetXPos();
 		rect.right += m_camera->GetXPos();
 		rect.top += m_camera->GetYPos();
@@ -500,10 +503,10 @@ void CSpriteWnd::Render()
 		m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush);
 	}
 
-	for (int i = 0; i < m_addClips; i++)
+	for (int i = 0; i < m_addClips-1; i++)
 	{
 		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
-		D2D1_RECT_F rect = sprite->GetSize();
+		D2D1_RECT_F rect = sprite->GetRect();
 		rect.left += m_camera->GetXPos();
 		rect.right += m_camera->GetXPos();
 		rect.top += m_camera->GetYPos();

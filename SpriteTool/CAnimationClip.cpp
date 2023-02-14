@@ -19,8 +19,8 @@ void CAnimationClip::RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigne
 	if (!bitmap) return;
 	if (idx >= m_vecSprite.size()) return;
 
-	_pRenderTarget->DrawBitmap(bitmap, D2D1::RectF(_x, _y, m_vecSprite[idx]->GetSize().right - m_vecSprite[idx]->GetSize().left + _x, m_vecSprite[idx]->GetSize().bottom - m_vecSprite[idx]->GetSize().top + _y), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-		D2D1::RectF(m_vecSprite[idx]->GetSize().left, m_vecSprite[idx]->GetSize().top, m_vecSprite[idx]->GetSize().right, m_vecSprite[idx]->GetSize().bottom));
+	_pRenderTarget->DrawBitmap(bitmap, D2D1::RectF(_x, _y, m_vecSprite[idx]->GetRect().right - m_vecSprite[idx]->GetRect().left + _x, m_vecSprite[idx]->GetRect().bottom - m_vecSprite[idx]->GetRect().top + _y), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+		D2D1::RectF(m_vecSprite[idx]->GetRect().left, m_vecSprite[idx]->GetRect().top, m_vecSprite[idx]->GetRect().right, m_vecSprite[idx]->GetRect().bottom));
 }
 
 void CAnimationClip::RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x, float _y, bool _pivot)
@@ -34,20 +34,20 @@ void CAnimationClip::RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned 
 	if (!_pivot)
 		_pRenderTarget->DrawBitmap(sprite->GetBitmap(), 
 			D2D1::RectF(_x, _y,
-			sprite->GetSize().right - sprite->GetSize().left + _x,
-			sprite->GetSize().bottom - sprite->GetSize().top + _y),
+			sprite->GetRect().right - sprite->GetRect().left + _x,
+			sprite->GetRect().bottom - sprite->GetRect().top + _y),
 			1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-			D2D1::RectF(0, 0, sprite->GetSize().right, sprite->GetSize().bottom));
+			D2D1::RectF(0, 0, sprite->GetRect().right, sprite->GetRect().bottom));
 	else
 	{
 		//if (!bitmap) return;
 		_pRenderTarget->DrawBitmap(sprite->GetBitmap(), D2D1::RectF(
-			_x - sprite->GetPivotX() * (sprite->GetSize().right - sprite->GetSize().left),
-			_y - sprite->GetPivotY() * (sprite->GetSize().bottom - sprite->GetSize().top),
-			sprite->GetSize().right - sprite->GetSize().left + _x - sprite->GetPivotX() * (sprite->GetSize().right - sprite->GetSize().left),
-			sprite->GetSize().bottom - sprite->GetSize().top + _y - sprite->GetPivotY() * (sprite->GetSize().bottom - sprite->GetSize().top)),
+			_x - sprite->GetPivotX() * (sprite->GetRect().right - sprite->GetRect().left),
+			_y - sprite->GetPivotY() * (sprite->GetRect().bottom - sprite->GetRect().top),
+			sprite->GetRect().right - sprite->GetRect().left + _x - sprite->GetPivotX() * (sprite->GetRect().right - sprite->GetRect().left),
+			sprite->GetRect().bottom - sprite->GetRect().top + _y - sprite->GetPivotY() * (sprite->GetRect().bottom - sprite->GetRect().top)),
 			1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-			D2D1::RectF(0, 0, sprite->GetSize().right, sprite->GetSize().bottom));
+			D2D1::RectF(0, 0, sprite->GetRect().right, sprite->GetRect().bottom));
 	}
 }
 
@@ -67,13 +67,14 @@ void CAnimationClip::AddClip(ID2D1HwndRenderTarget* _pRenderTarget, CCamera* _ca
 	for (int i = 0; i < m_vecSprite.size(); i++)
 	{
 		CSprite sprite = *m_vecSprite[i]; // AnimWnd에 있는 클립들의 Rect는 다름
-		D2D1_RECT_F rect = sprite.GetSize();
+		D2D1_RECT_F rect = sprite.GetRect();
 		rect.left += _camera->GetXPos();
 		rect.right += _camera->GetXPos();
 		rect.top += _camera->GetYPos();
 		rect.bottom += _camera->GetYPos();
 		if (rect.left <= _xpos && _xpos <= rect.right && rect.top <= _ypos && rect.bottom >= _ypos)
 		{
+			sprite.SetSize(D2D1::SizeF(rect.right - rect.left, rect.bottom - rect.top));
 			sprite.CopyPixel(_pRenderTarget);
 			CSprite* s = new CSprite(sprite);
 			m_vecClip.push_back(s);
@@ -107,7 +108,7 @@ CSprite* CAnimationClip::GetClipInPos(int _xpos, int _ypos, D2D1_RECT_F& _r, CCa
 	for (int i = 0; i < size; i++)
 	{
 		sprite = m_vecClip[i];
-		D2D1_RECT_F rect = sprite->GetSize();
+		D2D1_RECT_F rect = sprite->GetRect();
 
 		int width = rect.right - rect.left;
 		int height = rect.bottom - rect.top;

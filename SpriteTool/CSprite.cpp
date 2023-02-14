@@ -9,14 +9,14 @@ CSprite::CSprite(const CSprite& sprite)
 {
 	m_pivotX = sprite.m_pivotX;
 	m_pivotY = sprite.m_pivotY;
-	m_size = sprite.m_size;
+	m_rect = sprite.m_rect;
 	m_pixel = sprite.m_pixel;
 	m_bitmap = sprite.m_bitmap;
 }
 
 CSprite::CSprite(D2D1_RECT_F _rect)
 {
-	m_size = _rect;
+	m_rect = _rect;
 }
 
 CSprite::~CSprite()
@@ -25,8 +25,8 @@ CSprite::~CSprite()
 
 void CSprite::CopyPixel(ID2D1HwndRenderTarget* _pRenderTarget)
 {
-	int width = m_size.right - m_size.left;
-	int height = m_size.bottom - m_size.top;
+	int width = m_rect.right - m_rect.left;
+	int height = m_rect.bottom - m_rect.top;
 	m_pixel = (DWORD*)malloc(sizeof(DWORD) * width * height);
 	//memset(m_pixel, 0, sizeof(DWORD) * width * height);
 
@@ -35,9 +35,9 @@ void CSprite::CopyPixel(ID2D1HwndRenderTarget* _pRenderTarget)
 	D2D1_SIZE_F bitmapSize = CBitmap::GetInst()->GetBitmapSize();
 	
 	int offset = 0;
-	int j = m_size.left;
+	int j = m_rect.left;
 
-	for (int i = m_size.top; i < m_size.bottom; i++)
+	for (int i = m_rect.top; i < m_rect.bottom; i++)
 	{
 		memcpy(m_pixel + offset, pixel + (DWORD)(i * bitmapSize.width + j), width * sizeof(DWORD));
 		offset += width;

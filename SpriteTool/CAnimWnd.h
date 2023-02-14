@@ -9,12 +9,6 @@ class CAnimViewWnd;
 class CSprite;
 class CCamera;
 
-enum class Type
-{
-	Tile,
-	Block,
-	Character
-};
 
 class CAnimWnd : public CBWnd
 {

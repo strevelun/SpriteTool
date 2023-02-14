@@ -172,14 +172,16 @@ void CBitmap::SaveClip(HWND _hWnd, Type _type)
 
 	int size = CAnimationClip::GetInst()->GetVecClipSize();
 	fwrite(&size, sizeof(int), 1, pFile);
-	fwrite(&_type, sizeof(Type), 1, pFile);
+	//fwrite(&_type, sizeof(Type), 1, pFile);
+
 
 	for (int i = 0; i < size; i++)
 	{
 		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
+		sprite->SetType(_type);
 		fwrite(sprite, sizeof(CSprite), 1, pFile);
-		int width = sprite->GetSize().right - sprite->GetSize().left;
-		int height = sprite->GetSize().bottom - sprite->GetSize().top;
+		int width = sprite->GetRect().right - sprite->GetRect().left;
+		int height = sprite->GetRect().bottom - sprite->GetRect().top;
 		fwrite(&width, sizeof(int), 1, pFile);
 		fwrite(&height, sizeof(int), 1, pFile);
 		//for(int i=0; i<height; i++)
