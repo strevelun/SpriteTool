@@ -6,6 +6,10 @@
 #define IDR_MENU2                       102
 #define IDD_DIALOG1                     105
 #define IDD_DIALOG2                     109
+#define IDC_TYPE_GROUP                  1001
+#define IDC_TYPE_TILE                   2001
+#define IDC_TYPE_BLOCK                  2002
+#define IDC_TYPE_CHARACTER              2003
 #define ID_LOAD_IMAGE                   40001
 #define ID_AUTO_SLICE                   40002
 #define ID_DRAG_SLICE                   40003
@@ -21,17 +25,14 @@
 #define ID_GRID_SLICE                   40013
 #define IDC_EDIT                        40014
 #define IDC_EDIT2                       40015
-#define IDC_TYPE_GROUP   1001
-#define IDC_TYPE_TILE      2001
-#define IDC_TYPE_BLOCK      2002
-#define IDC_TYPE_CHARACTER      2003
+#define ID_GRID_X					40016
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        111
-#define _APS_NEXT_COMMAND_VALUE         40014
+#define _APS_NEXT_COMMAND_VALUE         40015
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

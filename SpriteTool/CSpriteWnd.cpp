@@ -18,6 +18,7 @@
 int s_gridX, s_gridY;
 
 INT_PTR CALLBACK GridDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK GridXDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY)
 {
@@ -411,8 +412,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case ID_AUTO_SLICE:
 			m_mode = MouseMode::AutoSlice;
-			//AutoSliceSprite();
-			AutoXGridSlice(15);
+			AutoSliceSprite();
 			break;
 		case ID_DRAG_SLICE:
 			m_mode = MouseMode::DragSlice;
@@ -426,6 +426,14 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				MAKEINTRESOURCE(IDD_DIALOG1), // dialog box resource
 				hWnd,                          // owner window
 				GridDialogProc // dialog box window procedure
+			);
+			break;
+
+		case ID_GRID_X:
+			DialogBox(m_hInst,                   // application instance
+				MAKEINTRESOURCE(IDD_DIALOG1), // dialog box resource
+				hWnd,                          // owner window
+				GridXDialogProc // dialog box window procedure
 			);
 			break;
 
@@ -708,6 +716,98 @@ INT_PTR CALLBACK GridDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			n = atoi(input);
 			s_gridY = n;
 			CApp::GetInst()->GetSpriteWnd()->GridSlice();
+
+			EndDialog(hDlg, TRUE);
+			return TRUE;
+		}
+		case IDCANCEL:
+			EndDialog(hDlg, TRUE);
+			return TRUE;
+		}
+		return 0;
+	}
+	return FALSE;
+
+	UNREFERENCED_PARAMETER(lParam);
+}
+
+INT_PTR CALLBACK GridXDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	TCHAR gridX[5];
+	WORD gridXLength = 0;
+
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		// Set the default push button to "Cancel." 
+		SendMessage(hDlg,
+			DM_SETDEFID,
+			(WPARAM)IDCANCEL,
+			(LPARAM)0);
+
+		return TRUE;
+
+	case WM_COMMAND:
+		// Set the default push button to "OK" when the user enters text. 
+		if (HIWORD(wParam) == EN_CHANGE)//&&
+			//LOWORD(wParam) == IDE_PASSWORDEDIT)
+		{
+			SendMessage(hDlg,
+				DM_SETDEFID,
+				(WPARAM)IDOK,
+				(LPARAM)0);
+		}
+		switch (wParam)
+		{
+		case IDOK:
+		{
+			// Get number of characters. 
+			gridXLength = (WORD)SendDlgItemMessage(hDlg,
+				IDC_EDIT,
+				EM_LINELENGTH,
+				(WPARAM)0,
+				(LPARAM)0);
+
+			if (gridXLength >= 5)
+			{
+				MessageBox(hDlg,
+					L"Too many characters.",
+					L"Error",
+					MB_OK);
+
+				EndDialog(hDlg, TRUE);
+				return FALSE;
+			}
+			else if (gridXLength == 0)
+			{
+				MessageBox(hDlg,
+					L"No characters entered.",
+					L"Error",
+					MB_OK);
+
+				EndDialog(hDlg, TRUE);
+				return FALSE;
+			}
+
+			// Put the number of characters into first word of buffer. 
+			*((LPWORD)gridX) = gridXLength;
+
+			// Get the characters. 
+			SendDlgItemMessage(hDlg,
+				IDC_EDIT,
+				EM_GETLINE,
+				(WPARAM)0,       // line 0 
+				(LPARAM)gridX);
+
+			// Null-terminate the string. 
+			gridX[gridXLength] = 0;
+
+
+			char input[5];
+			WideCharToMultiByte(CP_ACP, 0, gridX, 5, input, 5, NULL, NULL);
+			int n = atoi(input);
+			s_gridX = n;
+			CApp::GetInst()->GetSpriteWnd()->AutoXGridSlice(n);
 
 			EndDialog(hDlg, TRUE);
 			return TRUE;

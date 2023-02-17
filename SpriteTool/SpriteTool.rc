@@ -61,6 +61,7 @@ BEGIN
         MENUITEM "DragSlice",                   ID_DRAG_SLICE
         MENUITEM "AddClip",                     ID_ADD_CLIP
         MENUITEM "GridSlice",                   ID_GRID_SLICE
+        MENUITEM "GridXSlice", ID_GRID_X
     END
     POPUP "ªË¡¶"
     BEGIN
