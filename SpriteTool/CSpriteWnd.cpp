@@ -22,8 +22,6 @@ INT_PTR CALLBACK GridDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _curY)
 {
 	int curX = _curX, curY = _curY;
-	int searchX, searchY;
-	//int dir[8][2] = { {0,-1}, {1,-1}, {1,0}, {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1} }; // {x, y}
 	int dir[4][2] = { {0,-1}, {1,0}, {0,1},{-1,0} };
 	std::vector<std::pair<int, int>> v;
 
@@ -265,6 +263,99 @@ void CSpriteWnd::GridSlice()
 	}
 }
 
+void CSpriteWnd::AutoXGridSlice(int _gridX)
+{
+	ID2D1Bitmap* bitmap = CBitmap::GetInst()->GetBitmap();
+
+	if (!bitmap) return;
+
+	int gridCount = 0;
+
+	DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
+	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
+
+	std::vector<std::vector<int>> visited(size.height, std::vector<int>(size.width, 0));
+
+	DWORD first = timeGetTime();
+
+	for (int i = 0; i < size.height; i++)
+	{
+		for (int j = 0; j < size.width; j++)
+		{
+			if (visited[i][j]) continue;
+
+			if (bitmapPixel[i * (int)size.width + j] & 0xff000000)  // 0xffff00000
+			{
+				int curGrid = j / (CBitmap::GetInst()->GetBitmapSize().width / _gridX);
+				int curX = j;
+				int curY = i;
+				int dir[4][2] = { {0,-1}, {1,0}, {0,1},{-1,0} };
+				std::vector<std::pair<int, int>> v;
+
+				v.push_back(std::pair<int, int>(curY, curX));
+				visited[curY][curX] = 1;
+
+				int minX = 999999, minY = 999999;
+				int maxX = 0, maxY = 0;
+				D2D1_RECT_F rect = { 0 };
+
+				D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
+				DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
+
+				while (!v.empty())
+				{
+					std::pair<int, int> p = v.back();
+					curY = p.first;
+					curX = p.second;
+					v.pop_back();
+
+					for (int i = 0; i < 4; i++)
+					{
+						int nextX = curX + dir[i][0];
+						int nextY = curY + dir[i][1];
+
+						if (nextX < 0 || nextX >= size.width || nextY < 0 || nextY >= size.height)
+							continue;
+
+						if (visited[nextY][nextX]) continue;
+						
+						int temp = CBitmap::GetInst()->GetBitmapSize().width / _gridX;
+						
+						if (curGrid * temp <= nextX && nextX <= curGrid * temp + temp
+							&& bitmapPixel[nextY * (int)size.width + nextX] & 0xff000000)  // 0xffff00000
+						{
+							visited[nextY][nextX] = 1;
+
+							v.push_back({ nextY, nextX });
+							//if (maxX - minX < CBitmap::GetInst()->GetBitmapSize().width / _gridX)
+							if (minX > nextX)
+								minX = nextX;
+							if (maxX < nextX)
+								maxX = nextX;
+							if (minY > nextY)
+								minY = nextY;
+							if (maxY < nextY)
+								maxY = nextY;
+						}
+					}
+				}
+
+				if (minX < maxX)
+				{
+					rect.left = minX;
+					rect.top = minY;
+					rect.right = maxX;
+					rect.bottom = maxY;
+					CSprite* sprite = new CSprite(rect);
+					CAnimationClip::GetInst()->AddSprite(sprite);
+				}
+
+			}
+
+		}
+	}
+}
+
 CSpriteWnd::CSpriteWnd(HINSTANCE hInstance)
 {
 	m_hInst = hInstance;
@@ -320,7 +411,8 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case ID_AUTO_SLICE:
 			m_mode = MouseMode::AutoSlice;
-			AutoSliceSprite();
+			//AutoSliceSprite();
+			AutoXGridSlice(15);
 			break;
 		case ID_DRAG_SLICE:
 			m_mode = MouseMode::DragSlice;
@@ -506,6 +598,7 @@ void CSpriteWnd::Render()
 	for (int i = 0; i < m_addClips-1; i++)
 	{
 		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
+		if (sprite == nullptr) continue;
 		D2D1_RECT_F rect = sprite->GetRect();
 		rect.left += m_camera->GetXPos();
 		rect.right += m_camera->GetXPos();

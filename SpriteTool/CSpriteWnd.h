@@ -41,6 +41,7 @@ public:
 	bool Create(int _width, int _height, int nCmdShow);
 	LRESULT Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	void GridSlice();
+	void AutoXGridSlice(int _gridX);
 
 	void Render();
 
