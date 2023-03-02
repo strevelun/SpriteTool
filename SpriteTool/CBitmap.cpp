@@ -170,24 +170,25 @@ void CBitmap::SaveClip(HWND _hWnd, Type _type)
 	if (pFile == nullptr || errNum != 0)
 		return;
 
-	int size = CAnimationClip::GetInst()->GetVecClipSize();
+	CAnimationClip* animInst = CAnimationClip::GetInst();
+
+	int size = animInst->GetVecClipSize();
 	fwrite(&size, sizeof(int), 1, pFile);
-	//fwrite(&_type, sizeof(Type), 1, pFile);
-
-
+	CSprite* arr = new CSprite[size];
+	
 	for (int i = 0; i < size; i++)
 	{
-		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
-		sprite->SetType(_type);
-		fwrite(sprite, sizeof(CSprite), 1, pFile);
-		int width = sprite->GetRect().right - sprite->GetRect().left;
-		int height = sprite->GetRect().bottom - sprite->GetRect().top;
-		fwrite(&width, sizeof(int), 1, pFile);
-		fwrite(&height, sizeof(int), 1, pFile);
-		//for(int i=0; i<height; i++)
-		//	fwrite(&sprite->GetPixel()[i * width], sizeof(DWORD) * width, 1, pFile);
-		fwrite(&sprite->GetPixel()[0], sizeof(DWORD) * width , height, pFile);
+		arr[i] = *animInst->GetVecClip(i);
+		arr[i].SetType(_type);
+		int width = arr[i].GetRect().right - arr[i].GetRect().left;
+		int height = arr[i].GetRect().bottom - arr[i].GetRect().top;
+		arr[i].SetSize(D2D1::SizeF(width, height));
 	}
+
+	fwrite(arr, sizeof(CSprite), size, pFile);
+	
+	for (int i = 0; i < size; i++)
+		fwrite(&(arr[i].GetPixel()[0]), sizeof(DWORD) * arr[i].GetSize().width, arr[i].GetSize().height, pFile);
 
 	fclose(pFile);
 }
