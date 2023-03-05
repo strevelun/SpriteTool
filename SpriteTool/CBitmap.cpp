@@ -173,20 +173,21 @@ void CBitmap::SaveClip(HWND _hWnd, Type _type)
 	int size = CAnimationClip::GetInst()->GetVecClipSize();
 	fwrite(&size, sizeof(int), 1, pFile);
 	//fwrite(&_type, sizeof(Type), 1, pFile);
-
+	fwrite(&m_size, sizeof(D2D1_SIZE_F), 1, pFile);
+	fwrite(&m_bitmapPixel[0], sizeof(DWORD)* m_size.width, m_size.height, pFile);
 
 	for (int i = 0; i < size; i++)
 	{
 		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
 		sprite->SetType(_type);
-		fwrite(sprite, sizeof(CSprite), 1, pFile);
 		int width = sprite->GetRect().right - sprite->GetRect().left;
 		int height = sprite->GetRect().bottom - sprite->GetRect().top;
-		fwrite(&width, sizeof(int), 1, pFile);
-		fwrite(&height, sizeof(int), 1, pFile);
-		//for(int i=0; i<height; i++)
-		//	fwrite(&sprite->GetPixel()[i * width], sizeof(DWORD) * width, 1, pFile);
-		fwrite(&sprite->GetPixel()[0], sizeof(DWORD) * width , height, pFile);
+		sprite->SetSize(D2D1::SizeF(width, height));
+		fwrite(sprite, sizeof(CSprite), 1, pFile);
+
+		//fwrite(&width, sizeof(int), 1, pFile);
+		//fwrite(&height, sizeof(int), 1, pFile);
+		//fwrite(&sprite->GetPixel()[0], sizeof(DWORD) * width , height, pFile);
 	}
 
 	fclose(pFile);
