@@ -36,6 +36,7 @@ public:
 	void SetSize(D2D1_SIZE_F _size) { m_size = _size; }
 
 	D2D1_RECT_F GetRect() const { return m_rect; }
+	D2D1_SIZE_F GetSize() const { return m_size; }
 	float GetPivotX() const { return m_pivotX; }
 	float GetPivotY() const { return m_pivotY; }
 
