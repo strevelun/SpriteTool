@@ -174,7 +174,6 @@ void CBitmap::SaveClip(HWND _hWnd, Type _type)
 
 	int size = animInst->GetVecClipSize();
 	fwrite(&size, sizeof(int), 1, pFile);
-	//fwrite(&_type, sizeof(Type), 1, pFile);
 	fwrite(&m_size, sizeof(D2D1_SIZE_F), 1, pFile);
 	fwrite(&m_bitmapPixel[0], sizeof(DWORD)* m_size.width, m_size.height, pFile);
 
@@ -186,16 +185,7 @@ void CBitmap::SaveClip(HWND _hWnd, Type _type)
 		int height = sprite->GetRect().bottom - sprite->GetRect().top;
 		sprite->SetSize(D2D1::SizeF(width, height));
 		fwrite(sprite, sizeof(CSprite), 1, pFile);
-
-		//fwrite(&width, sizeof(int), 1, pFile);
-		//fwrite(&height, sizeof(int), 1, pFile);
-		//fwrite(&sprite->GetPixel()[0], sizeof(DWORD) * width , height, pFile);
 	}
-
-	fwrite(arr, sizeof(CSprite), size, pFile);
-	
-	for (int i = 0; i < size; i++)
-		fwrite(&(arr[i].GetPixel()[0]), sizeof(DWORD) * arr[i].GetSize().width, arr[i].GetSize().height, pFile);
 
 	fclose(pFile);
 }
