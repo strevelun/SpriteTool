@@ -10,32 +10,16 @@ enum class Type;
 class CBitmap
 {
 private:
-	static CBitmap* m_inst;
 	ID2D1Bitmap* m_bitmap = nullptr;
 	DWORD* m_bitmapPixel = nullptr;
 	D2D1_SIZE_F m_size;
 
 
 private:
-	CBitmap();
-	~CBitmap();
 
 public:
-	static CBitmap* GetInst() 
-	{
-		if (m_inst == nullptr)
-			m_inst = new CBitmap();
-		return m_inst;
-	}
-
-	static void DestroyInst()
-	{
-		if (m_inst != nullptr)
-		{
-			delete m_inst;
-			m_inst = nullptr;
-		}
-	}
+	CBitmap();
+	~CBitmap();
 
 	void OpenImageFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget);
 	void SaveImageFile(HWND _hWnd);

@@ -139,6 +139,7 @@
     <ClCompile Include="CSprite.cpp" />
     <ClCompile Include="CSpriteWnd.cpp" />
     <ClCompile Include="SpriteTool.cpp" />
+    <ClCompile Include="ToolManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAnimationClip.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="CSprite.h" />
     <ClInclude Include="CSpriteWnd.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ToolManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SpriteTool.rc" />

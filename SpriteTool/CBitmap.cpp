@@ -4,6 +4,7 @@
 #include "CAnimationClip.h"
 #include "CCamera.h"
 #include "CAnimWnd.h"
+#include "ToolManager.h"
 
 #include <sstream>
 #include <iomanip>
@@ -11,8 +12,6 @@
 #include <stack>
 #include <unordered_map>
 #include <string>
-
-CBitmap* CBitmap::m_inst = nullptr;
 
 CBitmap::CBitmap()
 {
@@ -144,7 +143,7 @@ void CBitmap::KeyColor(DWORD _keyColor)
 void CBitmap::SaveClip(HWND _hWnd, Type _type)
 {
 	if (!m_bitmap)	return;
-	if (CAnimationClip::GetInst()->GetVecClipSize() <= 0) return;
+	if (ToolManager::GetInst()->GetAnimClip()->GetVecClipSize() <= 0) return;
 
 	OPENFILENAME ofn;
 	TCHAR lpstrFile[100] = L"";
@@ -170,7 +169,7 @@ void CBitmap::SaveClip(HWND _hWnd, Type _type)
 	if (pFile == nullptr || errNum != 0)
 		return;
 
-	CAnimationClip* animInst = CAnimationClip::GetInst();
+	CAnimationClip* animInst = ToolManager::GetInst()->GetAnimClip();
 
 	int size = animInst->GetVecClipSize();
 	fwrite(&size, sizeof(int), 1, pFile);
@@ -179,7 +178,7 @@ void CBitmap::SaveClip(HWND _hWnd, Type _type)
 
 	for (int i = 0; i < size; i++)
 	{
-		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
+		CSprite* sprite = ToolManager::GetInst()->GetAnimClip()->GetVecClip(i);
 		sprite->SetType(_type);
 		int width = sprite->GetRect().right - sprite->GetRect().left;
 		int height = sprite->GetRect().bottom - sprite->GetRect().top;
@@ -194,12 +193,12 @@ void CBitmap::LoadClip(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 {
 	// 이미 클립이 있다면 기존 클립 전부 지우기
 
-	int clipSize = CAnimationClip::GetInst()->GetVecClipSize();
+	int clipSize = ToolManager::GetInst()->GetAnimClip()->GetVecClipSize();
 
 	if (clipSize > 0)
 	{
 		for(int i=0; i<clipSize; i++)
-			CAnimationClip::GetInst()->EraseClip(i);
+			ToolManager::GetInst()->GetAnimClip()->EraseClip(i);
 	}
 
 	OPENFILENAME ofn;
@@ -266,7 +265,7 @@ void CBitmap::LoadClip(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 		sprite->SetPixel(pixel);
 		_pRenderTarget->CreateBitmap(D2D1::SizeU(width, height), pixel, width * 4, &bpp, &bitmap);
 		sprite->SetBitmap(bitmap);
-		CAnimationClip::GetInst()->AddClip(sprite);
+		ToolManager::GetInst()->GetAnimClip()->AddClip(sprite);
 	}
 
 	fclose(pFile);

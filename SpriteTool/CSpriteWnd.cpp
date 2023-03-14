@@ -6,6 +6,7 @@
 #include "CAnimWnd.h"
 #include "CSprite.h"
 #include "CAnimationClip.h"
+#include "ToolManager.h"
 
 #include <windowsx.h>
 #include <string>
@@ -33,8 +34,8 @@ void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _c
 	int maxX = 0, maxY = 0;
 	D2D1_RECT_F rect = { 0 };
 
-	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
-	DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
+	D2D1_SIZE_F size = ToolManager::GetInst()->GetBitmap()->GetBitmapSize();
+	DWORD* bitmapPixel = ToolManager::GetInst()->GetBitmap()->GetBitmapPixel();
 
 	while (!v.empty())
 	{
@@ -79,18 +80,18 @@ void CSpriteWnd::Find(std::vector<std::vector<int>>& _visited, int _curX, int _c
 	}
 
 	CSprite* sprite = new CSprite(rect);
-	CAnimationClip::GetInst()->AddSprite(sprite);
+	ToolManager::GetInst()->GetAnimClip()->AddSprite(sprite);
 	m_count++;
 }
 
 void CSpriteWnd::AutoSliceSprite()
 {
-	ID2D1Bitmap* bitmap = CBitmap::GetInst()->GetBitmap();
+	ID2D1Bitmap* bitmap = ToolManager::GetInst()->GetBitmap()->GetBitmap();
 
 	if (!bitmap) return;
 
-	DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
-	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
+	DWORD* bitmapPixel = ToolManager::GetInst()->GetBitmap()->GetBitmapPixel();
+	D2D1_SIZE_F size = ToolManager::GetInst()->GetBitmap()->GetBitmapSize();
 
 	std::vector<std::vector<int>> visited(size.height, std::vector<int>(size.width, 0));
 
@@ -118,8 +119,8 @@ void CSpriteWnd::AutoSliceSprite()
 
 void CSpriteWnd::DragSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY)
 {
-	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
-	DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
+	D2D1_SIZE_F size = ToolManager::GetInst()->GetBitmap()->GetBitmapSize();
+	DWORD* bitmapPixel = ToolManager::GetInst()->GetBitmap()->GetBitmapPixel();
 
 	_startPosX -= _camera->GetXPos();
 	_endPosX -= _camera->GetXPos();
@@ -177,12 +178,12 @@ void CSpriteWnd::DragSprite(CCamera* _camera, int _startPosX, int _startPosY, in
 	}
 
 	CSprite* sprite = new CSprite(rect);
-	CAnimationClip::GetInst()->AddSprite(sprite);
+	ToolManager::GetInst()->GetAnimClip()->AddSprite(sprite);
 }
 
 void CSpriteWnd::RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, int _endPosX, int _endPosY, int& _addClips)
 {
-	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
+	D2D1_SIZE_F size = ToolManager::GetInst()->GetBitmap()->GetBitmapSize();
 
 	_startPosX -= _camera->GetXPos();
 	_endPosX -= _camera->GetXPos();
@@ -206,27 +207,27 @@ void CSpriteWnd::RemoveSprite(CCamera* _camera, int _startPosX, int _startPosY, 
 		_endPosY = t;
 	}
 
-	for (int i = 0; i < CAnimationClip::GetInst()->GetVecSpriteSize(); i++)
+	for (int i = 0; i < ToolManager::GetInst()->GetAnimClip()->GetVecSpriteSize(); i++)
 	{
-		CSprite* sprite = CAnimationClip::GetInst()->GetVecSprite(i);
+		CSprite* sprite = ToolManager::GetInst()->GetAnimClip()->GetVecSprite(i);
 		D2D1_RECT_F r = sprite->GetRect();
 		if (_startPosX <= r.left && r.right <= _endPosX && _startPosY <= r.top && _endPosY >= r.bottom)
 		{
-			for (int j = 0; j < CAnimationClip::GetInst()->GetVecClipSize(); j++)
+			for (int j = 0; j < ToolManager::GetInst()->GetAnimClip()->GetVecClipSize(); j++)
 			{
-				CSprite* sprite2 = CAnimationClip::GetInst()->GetVecClip(j);
+				CSprite* sprite2 = ToolManager::GetInst()->GetAnimClip()->GetVecClip(j);
 				D2D1_RECT_F r2 = sprite2->GetRect();
 				if (r.left == r2.left && r.top == r2.top && r.right == r2.right && r.bottom == r2.bottom)
 				{
-					CAnimationClip::GetInst()->EraseClip(j);
+					ToolManager::GetInst()->GetAnimClip()->EraseClip(j);
 					_addClips++;
 					break;
 				}
 			}
 
 			delete sprite;
-			CAnimationClip::GetInst()->EraseClip(i);
-			CAnimationClip::GetInst()->EraseSprite(i);
+			ToolManager::GetInst()->GetAnimClip()->EraseClip(i);
+			ToolManager::GetInst()->GetAnimClip()->EraseSprite(i);
 			i--; // 벡터 원소 지우면서 크기 변화때문에 스킵하는 원소 발생 방지
 		}
 	}
@@ -237,7 +238,7 @@ void CSpriteWnd::GridSlice()
 	if (s_gridX <= 0 || s_gridY <= 0)
 		return;
 
-	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
+	D2D1_SIZE_F size = ToolManager::GetInst()->GetBitmap()->GetBitmapSize();
 	int tileWidth = size.width / s_gridX;
 	int tileHeight = size.height / s_gridY;
 	int left = 0, top = 0, right = tileWidth, bottom = tileHeight;
@@ -252,7 +253,7 @@ void CSpriteWnd::GridSlice()
 			rect.right =  right;
 			rect.bottom =  bottom;
 			CSprite *sprite = new CSprite(rect);
-			CAnimationClip::GetInst()->AddSprite(sprite);
+			ToolManager::GetInst()->GetAnimClip()->AddSprite(sprite);
 
 			left += tileWidth;
 			right += tileWidth;
@@ -266,14 +267,14 @@ void CSpriteWnd::GridSlice()
 
 void CSpriteWnd::AutoXGridSlice(int _gridX)
 {
-	ID2D1Bitmap* bitmap = CBitmap::GetInst()->GetBitmap();
+	ID2D1Bitmap* bitmap = ToolManager::GetInst()->GetBitmap()->GetBitmap();
 
 	if (!bitmap) return;
 
 	int gridCount = 0;
 
-	DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
-	D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
+	DWORD* bitmapPixel = ToolManager::GetInst()->GetBitmap()->GetBitmapPixel();
+	D2D1_SIZE_F size = ToolManager::GetInst()->GetBitmap()->GetBitmapSize();
 
 	std::vector<std::vector<int>> visited(size.height, std::vector<int>(size.width, 0));
 
@@ -287,7 +288,7 @@ void CSpriteWnd::AutoXGridSlice(int _gridX)
 
 			if (bitmapPixel[i * (int)size.width + j] & 0xff000000)  // 0xffff00000
 			{
-				int curGrid = j / (CBitmap::GetInst()->GetBitmapSize().width / _gridX);
+				int curGrid = j / (ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width / _gridX);
 				int curX = j;
 				int curY = i;
 				int dir[4][2] = { {0,-1}, {1,0}, {0,1},{-1,0} };
@@ -300,8 +301,8 @@ void CSpriteWnd::AutoXGridSlice(int _gridX)
 				int maxX = 0, maxY = 0;
 				D2D1_RECT_F rect = { 0 };
 
-				D2D1_SIZE_F size = CBitmap::GetInst()->GetBitmapSize();
-				DWORD* bitmapPixel = CBitmap::GetInst()->GetBitmapPixel();
+				D2D1_SIZE_F size = ToolManager::GetInst()->GetBitmap()->GetBitmapSize();
+				DWORD* bitmapPixel = ToolManager::GetInst()->GetBitmap()->GetBitmapPixel();
 
 				while (!v.empty())
 				{
@@ -320,7 +321,7 @@ void CSpriteWnd::AutoXGridSlice(int _gridX)
 
 						if (visited[nextY][nextX]) continue;
 						
-						int temp = CBitmap::GetInst()->GetBitmapSize().width / _gridX;
+						int temp = ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width / _gridX;
 						
 						if (curGrid * temp <= nextX && nextX <= curGrid * temp + temp
 							&& bitmapPixel[nextY * (int)size.width + nextX] & 0xff000000)  // 0xffff00000
@@ -328,7 +329,7 @@ void CSpriteWnd::AutoXGridSlice(int _gridX)
 							visited[nextY][nextX] = 1;
 
 							v.push_back({ nextY, nextX });
-							//if (maxX - minX < CBitmap::GetInst()->GetBitmapSize().width / _gridX)
+							//if (maxX - minX < ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width / _gridX)
 							if (minX > nextX)
 								minX = nextX;
 							if (maxX < nextX)
@@ -348,7 +349,7 @@ void CSpriteWnd::AutoXGridSlice(int _gridX)
 					rect.right = maxX;
 					rect.bottom = maxY;
 					CSprite* sprite = new CSprite(rect);
-					CAnimationClip::GetInst()->AddSprite(sprite);
+					ToolManager::GetInst()->GetAnimClip()->AddSprite(sprite);
 				}
 
 			}
@@ -400,14 +401,14 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 
 		case ID_LOAD_IMAGE:
-			CAnimationClip::GetInst()->ClearVecSpriteAndClip();
+			ToolManager::GetInst()->GetAnimClip()->ClearVecSpriteAndClip();
 			m_addClips = 0;
-			CBitmap::GetInst()->OpenImageFile(hWnd, m_pRenderTarget);
+			ToolManager::GetInst()->GetBitmap()->OpenImageFile(hWnd, m_pRenderTarget);
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 			break;
 
 		case ID_SAVE_IMAGE:
-			CBitmap::GetInst()->SaveImageFile(hWnd);
+			ToolManager::GetInst()->GetBitmap()->SaveImageFile(hWnd);
 			break;
 
 		case ID_AUTO_SLICE:
@@ -439,20 +440,20 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case ID_KEY_COLOR:
 		{
-			CBitmap::GetInst()->KeyColor(m_keyColor);
+			ToolManager::GetInst()->GetBitmap()->KeyColor(m_keyColor);
 			D2D1_BITMAP_PROPERTIES bpp;
 			bpp.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
 			bpp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
 			bpp.dpiX = (FLOAT)0;
 			bpp.dpiY = (FLOAT)0;
 
-			CBitmap::GetInst()->GetBitmap()->Release();
+			ToolManager::GetInst()->GetBitmap()->GetBitmap()->Release();
 			ID2D1Bitmap* bitmap;
-			m_pRenderTarget->CreateBitmap(D2D1::SizeU(CBitmap::GetInst()->GetBitmapSize().width,
-				CBitmap::GetInst()->GetBitmapSize().height),
-				CBitmap::GetInst()->GetBitmapPixel(),
-				CBitmap::GetInst()->GetBitmapSize().width * 4, &bpp, &bitmap);
-			CBitmap::GetInst()->SetBitmap(bitmap);
+			m_pRenderTarget->CreateBitmap(D2D1::SizeU(ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width,
+				ToolManager::GetInst()->GetBitmap()->GetBitmapSize().height),
+				ToolManager::GetInst()->GetBitmap()->GetBitmapPixel(),
+				ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width * 4, &bpp, &bitmap);
+			ToolManager::GetInst()->GetBitmap()->SetBitmap(bitmap);
 			InvalidateRgn(hWnd, NULL, false);
 			break;
 		}
@@ -461,7 +462,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			break;
 		case ID_ALL_BOXES:
-			CAnimationClip::GetInst()->ClearVecSpriteAndClip();
+			ToolManager::GetInst()->GetAnimClip()->ClearVecSpriteAndClip();
 			InvalidateRgn(m_hWnd, NULL, false);
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 			m_addClips = 0;
@@ -483,7 +484,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		switch (wParam) {
 		case VK_LEFT:
-			if (m_camera->GetXPos() < CBitmap::GetInst()->GetBitmapSize().width)
+			if (m_camera->GetXPos() < ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width)
 				m_camera->UpdateXPos(15);
 			break;
 		case VK_RIGHT:
@@ -510,10 +511,12 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOUSEMOVE:
 	{
+		//Input.OnMouseMove(xPos, yPos);
+
 		int xpos = GET_X_LPARAM(lParam);
 		int ypos = GET_Y_LPARAM(lParam);
 		m_pMouse->UpdateMousePos(xpos, ypos);
-		CBitmap::GetInst()->GetPixelColorString(xpos, ypos);
+		ToolManager::GetInst()->GetBitmap()->GetPixelColorString(xpos, ypos);
 
 		InvalidateRgn(m_hWnd, NULL, false);
 		break;
@@ -526,13 +529,13 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		m_pMouse->UpdateMouseStartPos(xpos, ypos);
 		m_pMouse->UpdateClickState(true);
 
-		DWORD* pixel = CBitmap::GetInst()->GetBitmapPixel();
+		DWORD* pixel = ToolManager::GetInst()->GetBitmap()->GetBitmapPixel();
 		if (!pixel)
 			break;
-		if (xpos >= CBitmap::GetInst()->GetBitmapSize().width) break;
-		if (ypos >= CBitmap::GetInst()->GetBitmapSize().height) break;
+		if (xpos >= ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width) break;
+		if (ypos >= ToolManager::GetInst()->GetBitmap()->GetBitmapSize().height) break;
 
-		m_keyColor = pixel[ypos * (int)CBitmap::GetInst()->GetBitmapSize().width + xpos];
+		m_keyColor = pixel[ypos * (int)ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width + xpos];
 
 		break;
 	}
@@ -556,7 +559,7 @@ LRESULT CSpriteWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else if (m_mode == MouseMode::AddClip)
 		{
-			CAnimationClip::GetInst()->AddClip(m_pRenderTarget, m_camera, m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+			ToolManager::GetInst()->GetAnimClip()->AddClip(m_pRenderTarget, m_camera, m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
 			InvalidateRgn(CApp::GetInst()->GetAnimWnd()->GetHwnd(), NULL, false);
 			m_addClips++;
 		}
@@ -587,14 +590,14 @@ void CSpriteWnd::Render()
 	m_pRenderTarget->BeginDraw();
 	m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-	CBitmap::GetInst()->Render(m_pRenderTarget, m_camera);
+	ToolManager::GetInst()->GetBitmap()->Render(m_pRenderTarget, m_camera);
 
 	if(m_mode == MouseMode::DragSlice || m_mode == MouseMode::RemoveSprite)
 		m_pMouse->Render(m_pRenderTarget, m_pBlackBrush);
 
-	for(int i=0; i< CAnimationClip::GetInst()->GetVecSpriteSize(); i++)
+	for(int i=0; i< ToolManager::GetInst()->GetAnimClip()->GetVecSpriteSize(); i++)
 	{
-		CSprite * sprite = CAnimationClip::GetInst()->GetVecSprite(i);
+		CSprite * sprite = ToolManager::GetInst()->GetAnimClip()->GetVecSprite(i);
 		D2D1_RECT_F rect = sprite->GetRect();
 		rect.left += m_camera->GetXPos();
 		rect.right += m_camera->GetXPos();
@@ -605,7 +608,7 @@ void CSpriteWnd::Render()
 
 	for (int i = 0; i < m_addClips-1; i++)
 	{
-		CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(i);
+		CSprite* sprite = ToolManager::GetInst()->GetAnimClip()->GetVecClip(i);
 		if (sprite == nullptr) continue;
 		D2D1_RECT_F rect = sprite->GetRect();
 		rect.left += m_camera->GetXPos();
@@ -615,7 +618,7 @@ void CSpriteWnd::Render()
 		m_pRenderTarget->DrawRectangle(rect, m_pRedBrush);
 	}
 
-	std::wstring wstr = CBitmap::GetInst()->GetPixelColorString(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
+	std::wstring wstr = ToolManager::GetInst()->GetBitmap()->GetPixelColorString(m_pMouse->GetMouseX(), m_pMouse->GetMouseY());
 	const WCHAR* strColor = wstr.c_str();
 	m_pRenderTarget->DrawTextW(strColor, wstr.length(), m_pDWTextFormat, D2D1::RectF(100, 500, 250, 550), m_pBlackBrush);
 

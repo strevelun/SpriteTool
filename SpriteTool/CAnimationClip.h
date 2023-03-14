@@ -8,28 +8,15 @@ class CCamera;
 
 class CAnimationClip
 {
-	static CAnimationClip* m_inst;
 
-	CAnimationClip();
-	~CAnimationClip();
 private:
 	std::vector<CSprite*> m_vecSprite;
 	std::vector<CSprite*> m_vecClip;
 
 public:
-	static CAnimationClip* GetInst()
-	{
-		if (m_inst == nullptr)
-			m_inst = new CAnimationClip();
-		return m_inst;
-	}
+	CAnimationClip();
+	~CAnimationClip();
 
-	static void DestroyInst()
-	{
-		if (m_inst != nullptr)
-			delete m_inst;
-		m_inst = nullptr;
-	}
 
 	void RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f);
 	void RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x = 0.f, float _y = 0.f, bool _pivot = false);

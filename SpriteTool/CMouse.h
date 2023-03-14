@@ -2,6 +2,7 @@
 
 #include <d2d1.h>
 
+// mouse 의 상태값 저장 클래스
 class CMouse
 {
 	int m_mouseX = 0, m_mouseY = 0;

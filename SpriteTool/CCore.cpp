@@ -1,5 +1,6 @@
 #include "CCore.h"
 #include "CBitmap.h"
+#include "ToolManager.h"
 
 //#include <winrt/Windows.Foundation.Collections.h>
 //#include <winrt/Windows.Storage.Pickers.h>
@@ -141,7 +142,7 @@ void CCore::SaveBitmaptoFile(PCWSTR _fileName, ID2D1Bitmap* _pBitmap)
 
 	ID2D1Bitmap* bitmap;
 
-	pRT->CreateBitmap(D2D1::SizeU(sc_bitmapWidth, sc_bitmapHeight), CBitmap::GetInst()->GetBitmapPixel(), sc_bitmapWidth * 4, &bpp, &bitmap);
+	pRT->CreateBitmap(D2D1::SizeU(sc_bitmapWidth, sc_bitmapHeight), ToolManager::GetInst()->GetBitmap()->GetBitmapPixel(), sc_bitmapWidth * 4, &bpp, &bitmap);
 
 	pRT->BeginDraw();
 	pRT->DrawBitmap(bitmap);

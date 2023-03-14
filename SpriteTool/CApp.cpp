@@ -3,6 +3,7 @@
 #include "CBWnd.h"
 #include "CAnimWnd.h"
 #include "CSpriteWnd.h"
+#include "ToolManager.h"
 
 #include <windowsx.h>
 
@@ -37,8 +38,7 @@ int CApp::Run()
 			DispatchMessage(&msg);
 		}
 	}
-
-	CBitmap::GetInst()->DestroyInst();
+	ToolManager::GetInst()->DestroyInst();
 	CCore::GetInst()->CleanupDevice();
 	CCore::DeleteInst();
 

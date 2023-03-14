@@ -1,5 +1,6 @@
 #include "CSprite.h"
 #include "CBitmap.h"
+#include "ToolManager.h"
 
 CSprite::CSprite()
 {
@@ -30,9 +31,9 @@ void CSprite::CopyPixel(ID2D1HwndRenderTarget* _pRenderTarget)
 	m_pixel = (DWORD*)malloc(sizeof(DWORD) * width * height);
 	//memset(m_pixel, 0, sizeof(DWORD) * width * height);
 
-	DWORD* pixel = CBitmap::GetInst()->GetBitmapPixel();
+	DWORD* pixel = ToolManager::GetInst()->GetBitmap()->GetBitmapPixel();
 
-	D2D1_SIZE_F bitmapSize = CBitmap::GetInst()->GetBitmapSize();
+	D2D1_SIZE_F bitmapSize = ToolManager::GetInst()->GetBitmap()->GetBitmapSize();
 	
 	int offset = 0;
 	int j = m_rect.left;

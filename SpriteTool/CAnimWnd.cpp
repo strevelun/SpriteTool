@@ -8,6 +8,7 @@
 #include "CAnimViewWnd.h"
 #include "CAnimationClip.h"
 #include "CCamera.h"
+#include "ToolManager.h"
 
 #include <windowsx.h>
 
@@ -52,7 +53,7 @@ BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPara
 			break;
 
 		case IDOK:
-			CBitmap::GetInst()->SaveClip(hwndDlg, type);
+			ToolManager::GetInst()->GetBitmap()->SaveClip(hwndDlg, type);
 			EndDialog(hwndDlg, TRUE);
 			return TRUE;
 		}
@@ -108,7 +109,7 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 
 		case ID_LOAD_CLIP:
-			CBitmap::GetInst()->LoadClip(hWnd, m_pRenderTarget);
+			ToolManager::GetInst()->GetBitmap()->LoadClip(hWnd, m_pRenderTarget);
 			break;
 
 		case ID_ANIMATION:
@@ -121,7 +122,7 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		switch (wParam) {
 		case VK_LEFT:
-			//if (m_camera->GetXPos() < CBitmap::GetInst()->GetBitmapSize().width)
+			//if (m_camera->GetXPos() < ToolManager::GetInst()->GetBitmap()->GetBitmapSize().width)
 			m_camera->UpdateXPos(15);
 			break;
 		case VK_RIGHT:
@@ -149,7 +150,7 @@ LRESULT CAnimWnd::Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		int ypos = GET_Y_LPARAM(lParam);
 		xpos -= m_camera->GetXPos();
 		D2D1_RECT_F rect = {0};
-		CSprite* sprite = CAnimationClip::GetInst()->GetClipInPos(xpos, ypos, rect, m_camera);
+		CSprite* sprite = ToolManager::GetInst()->GetAnimClip()->GetClipInPos(xpos, ypos, rect, m_camera);
 		//rect.left += m_camera->GetXPos();
 		//rect.right += m_camera->GetXPos();
 		//if (sprite != {})
@@ -192,10 +193,10 @@ void CAnimWnd::Render()
 
 	int pos = 0;
 
-	for (int i = 0; i < CAnimationClip::GetInst()->GetVecClipSize(); i++)
+	for (int i = 0; i < ToolManager::GetInst()->GetAnimClip()->GetVecClipSize(); i++)
 	{
-		CSprite* clip = CAnimationClip::GetInst()->GetVecClip(i);
-		CAnimationClip::GetInst()->RenderClip(m_pRenderTarget, i, pos + m_camera->GetXPos());
+		CSprite* clip = ToolManager::GetInst()->GetAnimClip()->GetVecClip(i);
+		ToolManager::GetInst()->GetAnimClip()->RenderClip(m_pRenderTarget, i, pos + m_camera->GetXPos());
 		D2D1_RECT_F rect = clip->GetRect();
 		rect.left = pos + m_camera->GetXPos();
 		rect.bottom -= rect.top;

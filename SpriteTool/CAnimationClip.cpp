@@ -2,8 +2,7 @@
 #include "CSprite.h"
 #include "CBitmap.h"
 #include "CCamera.h"
-
-CAnimationClip* CAnimationClip::m_inst = nullptr;
+#include "ToolManager.h"
 
 CAnimationClip::CAnimationClip()
 {
@@ -15,7 +14,7 @@ CAnimationClip::~CAnimationClip()
 
 void CAnimationClip::RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x, float _y)
 {
-	ID2D1Bitmap* bitmap = CBitmap::GetInst()->GetBitmap();
+	ID2D1Bitmap* bitmap = ToolManager::GetInst()->GetBitmap()->GetBitmap();
 	if (!bitmap) return;
 	if (idx >= m_vecSprite.size()) return;
 
@@ -25,11 +24,11 @@ void CAnimationClip::RenderSprite(ID2D1HwndRenderTarget* _pRenderTarget, unsigne
 
 void CAnimationClip::RenderClip(ID2D1HwndRenderTarget* _pRenderTarget, unsigned int idx, float _x, float _y, bool _pivot)
 {
-	ID2D1Bitmap* bitmap = CBitmap::GetInst()->GetBitmap();
+	ID2D1Bitmap* bitmap = ToolManager::GetInst()->GetBitmap()->GetBitmap();
 
-	if (idx >= CAnimationClip::GetInst()->GetVecClipSize()) return;
+	if (idx >= ToolManager::GetInst()->GetAnimClip()->GetVecClipSize()) return;
 
-	CSprite* sprite = CAnimationClip::GetInst()->GetVecClip(idx);
+	CSprite* sprite = ToolManager::GetInst()->GetAnimClip()->GetVecClip(idx);
 
 	if (!_pivot)
 		_pRenderTarget->DrawBitmap(sprite->GetBitmap(), 

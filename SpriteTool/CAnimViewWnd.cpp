@@ -2,6 +2,7 @@
 #include "CBitmap.h"
 #include "CSprite.h"
 #include "CAnimationClip.h"
+#include "ToolManager.h"
 
 CAnimViewWnd::CAnimViewWnd(HINSTANCE _hInstance)
 {
@@ -65,12 +66,12 @@ void CAnimViewWnd::Render()
 	m_pRenderTarget->BeginDraw();
 	m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-	int size = CAnimationClip::GetInst()->GetVecClipSize();
+	int size = ToolManager::GetInst()->GetAnimClip()->GetVecClipSize();
 	if (size <= 0) return;
 
 	m_curIdx = (m_curIdx + 1) % size;
 
-	CAnimationClip::GetInst()->RenderClip(m_pRenderTarget, m_curIdx, 200, 200, true);
+	ToolManager::GetInst()->GetAnimClip()->RenderClip(m_pRenderTarget, m_curIdx, 200, 200, true);
 
 	m_pRenderTarget->EndDraw();
 }
