@@ -10,6 +10,8 @@
 #define IDC_TYPE_TILE                   2001
 #define IDC_TYPE_BLOCK                  2002
 #define IDC_TYPE_CHARACTER              2003
+#define IDC_TYPE_ANIM                   2004
+#define IDC_TYPE_CHARACTER2             2004
 #define ID_LOAD_IMAGE                   40001
 #define ID_AUTO_SLICE                   40002
 #define ID_DRAG_SLICE                   40003
@@ -25,7 +27,7 @@
 #define ID_GRID_SLICE                   40013
 #define IDC_EDIT                        40014
 #define IDC_EDIT2                       40015
-#define ID_GRID_X					40016
+#define ID_GRID_X                       40016
 
 // Next default values for new objects
 // 

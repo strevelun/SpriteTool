@@ -37,5 +37,7 @@ public:
 
 	void SaveClip(HWND _hWnd, Type _type);
 	void LoadClip(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget);
+
+	void SaveAnim(HWND _hWnd);
 };
 

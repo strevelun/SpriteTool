@@ -270,3 +270,72 @@ void CBitmap::LoadClip(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 
 	fclose(pFile);
 }
+
+void CBitmap::SaveAnim(HWND _hWnd)
+{
+	if (!m_bitmap)	return;
+	if (ToolManager::GetInst()->GetAnimClip()->GetVecClipSize() <= 0) return;
+
+	OPENFILENAME ofn;
+	TCHAR lpstrFile[100] = L"";
+	static TCHAR filter[] = L"anim\0*.anim";
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = _hWnd;
+	ofn.lpstrFilter = filter;
+	ofn.lpstrFile = lpstrFile;
+	ofn.nMaxFile = 100;
+	ofn.lpstrInitialDir = L".";
+
+	if (GetSaveFileName(&ofn) == 0) return;
+
+	std::stack<char> s;
+	int i = 0;
+
+	for (int i = wcslen(ofn.lpstrFile); i >= 0; i--)
+	{
+		if (ofn.lpstrFile[i] == '\\')
+			break;
+		char a = ofn.lpstrFile[i];
+		s.push(a);
+	}
+
+	i = 0;
+	TCHAR fileName[100] = L"";
+	while (s.top() != '\0')
+	{
+		fileName[i] = s.top();
+		s.pop();
+		i++;
+	}
+
+	std::wstring strFilePath = lpstrFile;
+	strFilePath.append(L".");
+	strFilePath.append(ofn.lpstrFilter);
+
+	FILE* pFile = nullptr;
+
+	errno_t errNum = _wfopen_s(&pFile, strFilePath.c_str(), L"wb");
+
+	if (pFile == nullptr || errNum != 0)
+		return;
+
+	CAnimationClip* animInst = ToolManager::GetInst()->GetAnimClip();
+
+	fwrite(&fileName, 100, 1, pFile);
+	int size = animInst->GetVecClipSize();
+	fwrite(&size, sizeof(int), 1, pFile);
+	fwrite(&m_size, sizeof(D2D1_SIZE_F), 1, pFile);
+	fwrite(&m_bitmapPixel[0], sizeof(DWORD) * m_size.width, m_size.height, pFile);
+
+	for (int i = 0; i < size; i++)
+	{
+		CSprite* sprite = ToolManager::GetInst()->GetAnimClip()->GetVecClip(i);
+		int width = sprite->GetRect().right - sprite->GetRect().left;
+		int height = sprite->GetRect().bottom - sprite->GetRect().top;
+		sprite->SetSize(D2D1::SizeF(width, height));
+		fwrite(sprite, sizeof(CSprite), 1, pFile);
+	}
+
+	fclose(pFile);
+}

@@ -25,6 +25,7 @@ BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPara
 		SendMessage(GetDlgItem(hwndDlg, IDC_TYPE_TILE), BM_SETCHECK, BST_CHECKED, 0);
 		SendMessage(GetDlgItem(hwndDlg, IDC_TYPE_BLOCK), BM_SETCHECK, BST_UNCHECKED, 0);
 		SendMessage(GetDlgItem(hwndDlg, IDC_TYPE_CHARACTER), BM_SETCHECK, BST_UNCHECKED, 0);
+		SendMessage(GetDlgItem(hwndDlg, IDC_TYPE_ANIM), BM_SETCHECK, BST_UNCHECKED, 0);
 		
 		return TRUE;
 
@@ -52,8 +53,17 @@ BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPara
 			}
 			break;
 
+		case IDC_TYPE_ANIM:
+			if (event == BN_CLICKED) {
+				type = Type::None;
+			}
+			break;
+
 		case IDOK:
-			ToolManager::GetInst()->GetBitmap()->SaveClip(hwndDlg, type);
+			if (type != Type::None)
+				ToolManager::GetInst()->GetBitmap()->SaveClip(hwndDlg, type);
+			else
+				ToolManager::GetInst()->GetBitmap()->SaveAnim(hwndDlg);
 			EndDialog(hwndDlg, TRUE);
 			return TRUE;
 		}

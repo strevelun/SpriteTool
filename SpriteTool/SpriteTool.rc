@@ -61,7 +61,7 @@ BEGIN
         MENUITEM "DragSlice",                   ID_DRAG_SLICE
         MENUITEM "AddClip",                     ID_ADD_CLIP
         MENUITEM "GridSlice",                   ID_GRID_SLICE
-        MENUITEM "GridXSlice", ID_GRID_X
+        MENUITEM "GridXSlice",                  ID_GRID_X
     END
     POPUP "삭제"
     BEGIN
@@ -107,11 +107,12 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "타입 설정"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "선택",IDC_TYPE_GROUP,62,18,70,50,WS_TABSTOP
+    GROUPBOX        "선택",IDC_TYPE_GROUP,62,18,70,59,WS_TABSTOP
     CONTROL         "타일",IDC_TYPE_TILE,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,67,33,50,8
     CONTROL         "블록",IDC_TYPE_BLOCK,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,67,43,50,8
     CONTROL         "캐릭터",IDC_TYPE_CHARACTER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,67,53,50,8
     DEFPUSHBUTTON   "확인",IDOK,144,78,50,14
+    CONTROL         "애니메이션",IDC_TYPE_ANIM,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,67,66,50,8
 END
 
 
@@ -137,7 +138,7 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 194
-        TOPMARGIN, 7
+        TOPMARGIN, 6
         BOTTOMMARGIN, 92
     END
 END
