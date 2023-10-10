@@ -26,7 +26,7 @@ void CBitmap::OpenImageFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 
 	OPENFILENAME OFN;
 	TCHAR filePathName[100] = L"";
-	TCHAR lpstrFile[100] = L"";
+	TCHAR lpstrFile[1000] = L"";
 	static TCHAR filter[] = L"이미지 파일\0*.png";
 
 	memset(&OFN, 0, sizeof(OPENFILENAME));
@@ -34,7 +34,7 @@ void CBitmap::OpenImageFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 	OFN.hwndOwner = _hWnd;
 	OFN.lpstrFilter = filter;
 	OFN.lpstrFile = lpstrFile;
-	OFN.nMaxFile = 100;
+	OFN.nMaxFile = sizeof(lpstrFile);
 	OFN.lpstrInitialDir = L".";
 
 	if (GetOpenFileName(&OFN) == 0) return;
@@ -51,7 +51,7 @@ void CBitmap::OpenImageFile(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 	}
 
 	i = 0;
-	TCHAR fileName[100] = L"";
+	TCHAR fileName[1000] = L"";
 	while (s.top() != '\0')
 	{
 		fileName[i] = s.top();
@@ -81,7 +81,7 @@ void CBitmap::SaveImageFile(HWND _hWnd)
 	ofn.hwndOwner = _hWnd;
 	ofn.lpstrFilter = filter;
 	ofn.lpstrFile = lpstrFile;
-	ofn.nMaxFile = 100;
+	ofn.nMaxFile = sizeof(lpstrFile);
 	ofn.lpstrInitialDir = L".";
 
 	if (GetSaveFileName(&ofn) == 0) return;
@@ -153,7 +153,7 @@ void CBitmap::SaveClip(HWND _hWnd, Type _type)
 	ofn.hwndOwner = _hWnd;
 	ofn.lpstrFilter = filter;
 	ofn.lpstrFile = lpstrFile;
-	ofn.nMaxFile = 100;
+	ofn.nMaxFile = sizeof(lpstrFile);
 	ofn.lpstrInitialDir = L".";
 
 	if (GetSaveFileName(&ofn) == 0) return;
@@ -209,7 +209,7 @@ void CBitmap::LoadClip(HWND _hWnd, ID2D1HwndRenderTarget* _pRenderTarget)
 	ofn.hwndOwner = _hWnd;
 	ofn.lpstrFilter = filter;
 	ofn.lpstrFile = lpstrFile;
-	ofn.nMaxFile = 100;
+	ofn.nMaxFile = sizeof(lpstrFile);
 	ofn.lpstrInitialDir = L".";
 
 	if (GetOpenFileName(&ofn) == 0) return;
@@ -277,17 +277,18 @@ void CBitmap::SaveAnim(HWND _hWnd)
 	if (ToolManager::GetInst()->GetAnimClip()->GetVecClipSize() <= 0) return;
 
 	OPENFILENAME ofn;
-	TCHAR lpstrFile[100] = L"";
+	TCHAR lpstrFile[1000] = L"";
 	static TCHAR filter[] = L"anim\0*.anim";
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = _hWnd;
 	ofn.lpstrFilter = filter;
 	ofn.lpstrFile = lpstrFile;
-	ofn.nMaxFile = 100;
+	ofn.nMaxFile = sizeof(lpstrFile);
 	ofn.lpstrInitialDir = L".";
 
-	if (GetSaveFileName(&ofn) == 0) return;
+	if (GetSaveFileName(&ofn) == 0) 
+		return;
 
 	std::stack<char> s;
 	int i = 0;
@@ -299,16 +300,16 @@ void CBitmap::SaveAnim(HWND _hWnd)
 		char a = ofn.lpstrFile[i];
 		s.push(a);
 	}
-
+	
 	i = 0;
-	TCHAR fileName[100] = L"";
+	TCHAR fileName[1000] = L"";
 	while (s.top() != '\0')
 	{
 		fileName[i] = s.top();
 		s.pop();
 		i++;
 	}
-
+	
 	std::wstring strFilePath = lpstrFile;
 	strFilePath.append(L".");
 	strFilePath.append(ofn.lpstrFilter);
@@ -325,8 +326,8 @@ void CBitmap::SaveAnim(HWND _hWnd)
 	fwrite(&fileName, 100, 1, pFile);
 	int size = animInst->GetVecClipSize();
 	fwrite(&size, sizeof(int), 1, pFile);
-	fwrite(&m_size, sizeof(D2D1_SIZE_F), 1, pFile);
-	fwrite(&m_bitmapPixel[0], sizeof(DWORD) * m_size.width, m_size.height, pFile);
+	//fwrite(&m_size, sizeof(D2D1_SIZE_F), 1, pFile);
+	//fwrite(&m_bitmapPixel[0], sizeof(DWORD) * m_size.width, m_size.height, pFile);
 
 	for (int i = 0; i < size; i++)
 	{
